@@ -1,15 +1,15 @@
 package com.example.todo_backend.dtos;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class BoardMemberDTO {
     private Long id;
-    private UserDTO user;
-    private Long boardId; // To avoid deep recursion
+    private Long userId;
+    private Long boardId;
     private String role;
 }
