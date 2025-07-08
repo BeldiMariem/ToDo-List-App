@@ -10,4 +10,6 @@ import com.example.todo_backend.entities.User;
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
     UserDTO toDTO(User user);
+    User toEntity(UserDTO dto);
+
 }

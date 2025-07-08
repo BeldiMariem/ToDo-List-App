@@ -1,6 +1,11 @@
 package com.example.todo_backend.entities;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -32,4 +37,8 @@ public class User {
 
   @OneToMany(mappedBy= "user", cascade= CascadeType.ALL)
   private List<CardMember> cardMemberships;
+
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority("USER"));
+    }
 }
