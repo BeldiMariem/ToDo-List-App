@@ -28,12 +28,12 @@ public class CommentController {
         return ResponseEntity.status(201).body(commentService.createComment(dto));
     }
 
-    @GetMapping("/card/{cardId}")
+    @GetMapping("/getCommentsByCard/{cardId}")
     public ResponseEntity<List<CommentDTO>> getCommentsByCard(@PathVariable Long cardId) {
         return ResponseEntity.ok(commentService.getCommentsByCardId(cardId));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/deleteComment/{id}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
         commentService.deleteComment(id);
         return ResponseEntity.noContent().build();
