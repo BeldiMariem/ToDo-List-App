@@ -1,15 +1,22 @@
 package com.example.todo_backend.services.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.example.todo_backend.dtos.CommentDTO;
+import com.example.todo_backend.entities.Card;
+import com.example.todo_backend.entities.Comment;
+import com.example.todo_backend.entities.User;
 import com.example.todo_backend.mappers.CommentMapper;
+import com.example.todo_backend.repositories.CardRepository;
 import com.example.todo_backend.repositories.CommentRepository;
+import com.example.todo_backend.repositories.UserRepository;
 import com.example.todo_backend.services.CommentService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -18,10 +25,20 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
+    private final CardRepository cardRepository;
+    private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public CommentDTO createComment(CommentDTO dto) {
-        return commentMapper.toDto(commentRepository.save(commentMapper.toEntity(dto)));
+        Card card = cardRepository.findById(dto.getCardId())
+                .orElseThrow(() -> new RuntimeException("Card not found"));
+
+        User user = userRepository.findById(dto.getUser().getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Comment saved = commentRepository.save(addComment(card, user,  dto));
+        return commentMapper.toDto(saved);
     }
 
     @Override
@@ -35,5 +52,14 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void deleteComment(Long id) {
         commentRepository.deleteById(id);
+    }
+
+    private Comment addComment(Card card, User user, CommentDTO dto) {
+        Comment comment = new Comment();
+        comment.setContent(dto.getContent());
+        comment.setCard(card);
+        comment.setUser(user);
+        comment.setCreatedAt(LocalDateTime.now());
+        return comment;
     }
 }

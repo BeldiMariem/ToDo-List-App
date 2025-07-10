@@ -10,4 +10,5 @@ import com.example.todo_backend.entities.Board;
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Long> {
      List<Board> findByMembers_User_Id(Long userId);
+     
 }
