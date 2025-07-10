@@ -10,6 +10,7 @@ import com.example.todo_backend.dtos.CommentDTO;
 import com.example.todo_backend.entities.Card;
 import com.example.todo_backend.entities.Comment;
 import com.example.todo_backend.entities.User;
+import com.example.todo_backend.exceptions.ResourceNotFoundException;
 import com.example.todo_backend.mappers.CommentMapper;
 import com.example.todo_backend.repositories.CardRepository;
 import com.example.todo_backend.repositories.CommentRepository;
@@ -31,30 +32,43 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public CommentDTO createComment(CommentDTO dto) {
-        Card card = cardRepository.findById(dto.getCardId())
-                .orElseThrow(() -> new RuntimeException("Card not found"));
+        Card card = findCardById(dto.getCardId());
+        User user = findUserById(dto.getUser().getId());
 
-        User user = userRepository.findById(dto.getUser().getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        Comment comment = buildComment(dto, card, user);
+        Comment savedComment = commentRepository.save(comment);
 
-        Comment saved = commentRepository.save(addComment(card, user,  dto));
-        return commentMapper.toDto(saved);
+        return commentMapper.toDto(savedComment);
     }
 
     @Override
     public List<CommentDTO> getCommentsByCardId(Long cardId) {
         return commentRepository.findAll().stream()
-                .filter(c -> c.getCard().getId().equals(cardId))
+                .filter(comment -> comment.getCard().getId().equals(cardId))
                 .map(commentMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void deleteComment(Long id) {
+        if (!commentRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Comment", "id", id);
+        }
         commentRepository.deleteById(id);
     }
 
-    private Comment addComment(Card card, User user, CommentDTO dto) {
+
+    private Card findCardById(Long cardId) {
+        return cardRepository.findById(cardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Card", "id", cardId));
+    }
+
+    private User findUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+    }
+
+    private Comment buildComment(CommentDTO dto, Card card, User user) {
         Comment comment = new Comment();
         comment.setContent(dto.getContent());
         comment.setCard(card);

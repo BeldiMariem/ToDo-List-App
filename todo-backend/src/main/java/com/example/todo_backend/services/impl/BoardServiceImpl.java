@@ -25,7 +25,6 @@ public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
     private final BoardMapper boardMapper;
-    //private final BoardMemberRepository boardMemberRepository;
     private final UserRepository userRepository;
 
     @Override
@@ -53,11 +52,14 @@ public class BoardServiceImpl implements BoardService {
     public BoardDTO getBoardById(Long id) {
         return boardRepository.findById(id)
                 .map(boardMapper::toSimpleDto)
-                .orElse(null);
+                .orElseThrow(() -> new ResourceNotFoundException("Board", "id", id));
     }
 
     @Override
     public void deleteBoard(Long id) {
+        if (!boardRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Board", "id", id);
+        }
         boardRepository.deleteById(id);
     }
 
@@ -66,11 +68,11 @@ public class BoardServiceImpl implements BoardService {
     public BoardDTO updateBoard(BoardUpdateDTO updateDTO, Long currentUserId) {
         Board board = findBoardById(updateDTO.getBoardId());
 
-        validateUserPermission(board, currentUserId);
-
-        if (isNotBlank(updateDTO.getNewName())) {
-            board.setName(updateDTO.getNewName());
+        if (!hasPermission(board, currentUserId)) {
+            throw new IllegalStateException("You do not have permission to modify this board");
         }
+
+        updateBoardNameIfPresent(board, updateDTO.getNewName());
 
         if (updateDTO.getUserIds() != null && !updateDTO.getUserIds().isEmpty()) {
             updateBoardMembers(board, updateDTO.getUserIds(), updateDTO.getRole());
@@ -90,15 +92,17 @@ public class BoardServiceImpl implements BoardService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
     }
 
-    private void validateUserPermission(Board board, Long userId) {
-        boolean hasPermission = board.getMembers().stream()
+    private boolean hasPermission(Board board, Long userId) {
+        return board.getMembers().stream()
                 .anyMatch(member ->
                         member.getUser().getId().equals(userId) &&
                         ("ADMIN".equalsIgnoreCase(member.getRole()) || "OWNER".equalsIgnoreCase(member.getRole()))
                 );
+    }
 
-        if (!hasPermission) {
-            throw new RuntimeException("You do not have permission to modify this board");
+    private void updateBoardNameIfPresent(Board board, String newName) {
+        if (newName != null && !newName.trim().isEmpty()) {
+            board.setName(newName);
         }
     }
 
@@ -111,17 +115,15 @@ public class BoardServiceImpl implements BoardService {
 
     private void addOrUpdateBoardMember(Board board, User user, String role) {
         board.getMembers().stream()
-                .filter(m -> m.getUser().getId().equals(user.getId()))
+                .filter(member -> member.getUser().getId().equals(user.getId()))
                 .findFirst()
                 .ifPresentOrElse(
-                        m -> {
-                            if (isNotBlank(role)) {
-                                m.setRole(role);
+                        member -> {
+                            if (role != null && !role.trim().isEmpty()) {
+                                member.setRole(role);
                             }
                         },
-                        () -> {
-                            addBoardMember(board, user, role);
-                        }
+                        () -> addBoardMember(board, user, role)
                 );
     }
 
@@ -129,13 +131,7 @@ public class BoardServiceImpl implements BoardService {
         BoardMember member = new BoardMember();
         member.setBoard(board);
         member.setUser(user);
-        member.setRole(isNotBlank(role) ? role : "MEMBER");
+        member.setRole(role != null && !role.trim().isEmpty() ? role : "MEMBER");
         board.getMembers().add(member);
-        //boardMemberRepository.save(member);
-
-    }
-
-    private boolean isNotBlank(String value) {
-        return value != null && !value.trim().isEmpty();
     }
 }
