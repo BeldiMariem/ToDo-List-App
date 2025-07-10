@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.example.todo_backend.dtos.ListDTO;
 import com.example.todo_backend.entities.Board;
 import com.example.todo_backend.entities.ListEntity;
+import com.example.todo_backend.exceptions.ResourceNotFoundException;
 import com.example.todo_backend.mappers.ListMapper;
 import com.example.todo_backend.repositories.BoardRepository;
 import com.example.todo_backend.repositories.ListEntityRepository;
@@ -27,8 +28,7 @@ public class ListServiceImpl implements ListService {
     @Override
     @Transactional
     public ListDTO createList(ListDTO listDTO) {
-        Board board = boardRepository.findById(listDTO.getBoardId())
-                .orElseThrow(() -> new RuntimeException("Board not found"));
+        Board board = findBoardById(listDTO.getBoardId());
 
         ListEntity list = new ListEntity();
         list.setName(listDTO.getName());
@@ -41,7 +41,7 @@ public class ListServiceImpl implements ListService {
     @Override
     public List<ListDTO> getListsByBoardId(Long boardId) {
         return listRepository.findAll().stream()
-                .filter(l -> l.getBoard().getId().equals(boardId))
+                .filter(list -> list.getBoard().getId().equals(boardId))
                 .map(listMapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -49,9 +49,18 @@ public class ListServiceImpl implements ListService {
     @Override
     @Transactional
     public void deleteList(Long listId) {
-        if (!listRepository.existsById(listId)) {
-            throw new RuntimeException("List not found");
-        }
-        listRepository.deleteById(listId);
+        ListEntity list = findListById(listId);
+        listRepository.delete(list);
+    }
+
+
+    private Board findBoardById(Long boardId) {
+        return boardRepository.findById(boardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Board", "id", boardId));
+    }
+
+    private ListEntity findListById(Long listId) {
+        return listRepository.findById(listId)
+                .orElseThrow(() -> new ResourceNotFoundException("List", "id", listId));
     }
 }
