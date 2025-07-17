@@ -20,6 +20,7 @@ import org.mockito.MockitoAnnotations;
 import com.example.todo_backend.dtos.CardDTO;
 import com.example.todo_backend.entities.Card;
 import com.example.todo_backend.entities.ListEntity;
+import com.example.todo_backend.entities.User;
 import com.example.todo_backend.exceptions.ResourceNotFoundException;
 import com.example.todo_backend.mappers.CardMapper;
 import com.example.todo_backend.repositories.CardRepository;
@@ -48,6 +49,10 @@ public class CardServiceImplTest {
     void createCard_shouldSaveAndReturnDto() {
         ListEntity list = new ListEntity();
         list.setId(1L);
+        
+        User user = new User();
+        user.setId(10L);
+
 
         CardDTO cardDTO = new CardDTO();
         cardDTO.setTitle("New Card");
@@ -75,7 +80,7 @@ public class CardServiceImplTest {
         when(cardRepository.save(any(Card.class))).thenReturn(savedCard);
         when(cardMapper.toDto(savedCard)).thenReturn(savedDto);
 
-        CardDTO result = cardService.createCard(cardDTO);
+        CardDTO result = cardService.createCard(cardDTO,user.getId());
 
         assertNotNull(result);
         assertEquals(10L, result.getId());

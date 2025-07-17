@@ -29,6 +29,8 @@ public class BoardController {
     @PostMapping("/createBoard")
     public ResponseEntity<BoardDTO> createBoard(@RequestBody BoardDTO boardDTO) {
         Long userId = authenticationService.getCurrentUserId();
+         System.out.println("Creating board for user ID: " + userId);
+
         return ResponseEntity.ok(boardService.createBoard(boardDTO, userId));
     }
 

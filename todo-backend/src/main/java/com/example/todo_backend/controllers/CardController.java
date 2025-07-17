@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.todo_backend.dtos.CardDTO;
+import com.example.todo_backend.services.AuthService;
 import com.example.todo_backend.services.CardService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,10 +24,13 @@ import lombok.RequiredArgsConstructor;
 public class CardController {
 
     private final CardService cardService;
+    private final AuthService authenticationService;
 
     @PostMapping("/createCard")
     public ResponseEntity<CardDTO> createCard(@RequestBody CardDTO cardDTO) {
-        CardDTO createdCard = cardService.createCard(cardDTO);
+        Long userId = authenticationService.getCurrentUserId();
+
+        CardDTO createdCard = cardService.createCard(cardDTO,userId);
         return ResponseEntity.status(201).body(createdCard);
     }
 
