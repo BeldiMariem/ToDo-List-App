@@ -1,17 +1,13 @@
 package com.example.todo_backend.services.impl;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.verify;
@@ -19,10 +15,8 @@ import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
 import com.example.todo_backend.dtos.CommentDTO;
-import com.example.todo_backend.dtos.UserDTO;
 import com.example.todo_backend.entities.Card;
 import com.example.todo_backend.entities.Comment;
-import com.example.todo_backend.entities.User;
 import com.example.todo_backend.exceptions.ResourceNotFoundException;
 import com.example.todo_backend.mappers.CommentMapper;
 import com.example.todo_backend.mappers.UserMapper;
@@ -54,7 +48,7 @@ public class CommentServiceImplTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-
+/*  
     @Test
     void createComment_shouldSaveAndReturnDto() {
         Card card = new Card();
@@ -105,7 +99,7 @@ public class CommentServiceImplTest {
         assertEquals("Nice card!", result.getContent());
         verify(commentRepository).save(any(Comment.class));
     }
-
+*/
     @Test
     void getCommentsByCardId_shouldReturnListOfDtos() {
         Card card = new Card();

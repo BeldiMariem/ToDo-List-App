@@ -13,6 +13,7 @@ import com.example.todo_backend.dtos.PasswordUpdateDTO;
 import com.example.todo_backend.dtos.UserDTO;
 import com.example.todo_backend.dtos.UserDeleteRequestDTO;
 import com.example.todo_backend.dtos.UserUpdateDTO;
+import com.example.todo_backend.repositories.UserRepository;
 import com.example.todo_backend.security.CustomUserDetails;
 import com.example.todo_backend.services.UserService;
 
@@ -24,6 +25,8 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
     private final UserService userService;
+        private final UserRepository    userRepository;
+
 
     @PutMapping("/updateProfile")
     public ResponseEntity<UserDTO> updateProfile(
@@ -35,7 +38,7 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
     }
 
-    @PutMapping("/me/password")
+    @PutMapping("/updatePassword")
     public ResponseEntity<Void> updatePassword(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody PasswordUpdateDTO dto) {
@@ -45,7 +48,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/me")
+    @DeleteMapping("/deleteUser")
     public ResponseEntity<Void> deleteUser(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody UserDeleteRequestDTO dto) {
@@ -56,7 +59,13 @@ public class UserController {
     }
 
     private Long getUserIdFromPrincipal(UserDetails userDetails) {
+        if (userDetails instanceof CustomUserDetails) {
+            return ((CustomUserDetails) userDetails).getUser().getId();
+        }
 
-    return ((CustomUserDetails) userDetails).getUser().getId();
+        // ✅ Fallback : chercher l’utilisateur dans la base par son username
+        return userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalStateException("User not found"))
+                .getId();
     }
 }
