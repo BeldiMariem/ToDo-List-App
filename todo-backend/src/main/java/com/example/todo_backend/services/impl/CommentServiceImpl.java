@@ -4,9 +4,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.example.todo_backend.dtos.CommentDTO;
+import com.example.todo_backend.dtos.UserDTO;
 import com.example.todo_backend.entities.Card;
 import com.example.todo_backend.entities.Comment;
 import com.example.todo_backend.entities.User;
@@ -17,6 +19,7 @@ import com.example.todo_backend.repositories.CommentRepository;
 import com.example.todo_backend.repositories.UserRepository;
 import com.example.todo_backend.services.CommentService;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -31,15 +34,31 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public CommentDTO createComment(CommentDTO dto) {
-        Card card = findCardById(dto.getCardId());
-        User user = findUserById(dto.getUser().getId());
+    public CommentDTO createComment(CommentDTO commentDTO, String username) {
+    User user = userRepository.findByUsername(username)
+        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        Comment comment = buildComment(dto, card, user);
-        Comment savedComment = commentRepository.save(comment);
+    Card card = cardRepository.findById(commentDTO.getCardId())
+        .orElseThrow(() -> new EntityNotFoundException("Card not found"));
 
-        return commentMapper.toDto(savedComment);
-    }
+    Comment comment = new Comment();
+    comment.setContent(commentDTO.getContent());
+    comment.setCard(card);
+    comment.setUser(user);
+    comment.setCreatedAt(LocalDateTime.now());
+
+    Comment savedComment = commentRepository.save(comment);
+
+    // Mapper en DTO pour la réponse, par exemple :
+    return new CommentDTO(
+        savedComment.getId(),
+        savedComment.getContent(),
+        savedComment.getCard().getId(),
+        new UserDTO(user.getId(), user.getUsername(), user.getEmail()),
+        savedComment.getCreatedAt()
+    );
+}
+
 
     @Override
     public List<CommentDTO> getCommentsByCardId(Long cardId) {

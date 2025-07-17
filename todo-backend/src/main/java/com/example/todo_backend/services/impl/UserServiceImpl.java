@@ -25,12 +25,13 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    @Transactional
     public UserDTO updateProfile(Long userId, UserUpdateDTO dto) {
         User user = findUserById(userId);
 
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
+
+        userRepository.save(user);
 
         return userMapper.toDTO(user);
     }
@@ -58,7 +59,6 @@ public class UserServiceImpl implements UserService {
 
         userRepository.delete(user);
     }
-
 
     private User findUserById(Long userId) {
         return userRepository.findById(userId)

@@ -1,7 +1,9 @@
 package com.example.todo_backend.controllers;
 
+import java.security.Principal;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,8 +26,10 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public ResponseEntity<CommentDTO> createComment(@RequestBody CommentDTO dto) {
-        return ResponseEntity.status(201).body(commentService.createComment(dto));
+    public ResponseEntity<CommentDTO> createComment(@RequestBody CommentDTO commentDTO, Principal principal) {
+        String username = principal.getName();
+        CommentDTO createdComment = commentService.createComment(commentDTO, username);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdComment);
     }
 
     @GetMapping("/getCommentsByCard/{cardId}")
@@ -39,4 +43,3 @@ public class CommentController {
         return ResponseEntity.noContent().build();
     }
 }
-
