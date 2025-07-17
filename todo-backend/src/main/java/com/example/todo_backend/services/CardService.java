@@ -5,7 +5,7 @@ import java.util.List;
 import com.example.todo_backend.dtos.CardDTO;
 
 public interface CardService {
-    CardDTO createCard(CardDTO dto);
+    CardDTO createCard(CardDTO dto, Long userId);
     CardDTO updateCard(Long cardId, CardDTO cardDTO);
 
     List<CardDTO> getCardsByListId(Long listId);

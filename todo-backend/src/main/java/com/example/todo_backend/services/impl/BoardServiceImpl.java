@@ -12,6 +12,7 @@ import com.example.todo_backend.entities.BoardMember;
 import com.example.todo_backend.entities.User;
 import com.example.todo_backend.exceptions.ResourceNotFoundException;
 import com.example.todo_backend.mappers.BoardMapper;
+import com.example.todo_backend.repositories.BoardMemberRepository;
 import com.example.todo_backend.repositories.BoardRepository;
 import com.example.todo_backend.repositories.UserRepository;
 import com.example.todo_backend.services.BoardService;
@@ -26,6 +27,7 @@ public class BoardServiceImpl implements BoardService {
     private final BoardRepository boardRepository;
     private final BoardMapper boardMapper;
     private final UserRepository userRepository;
+    private final BoardMemberRepository boardMemberRepository;
 
     @Override
     @Transactional
@@ -132,6 +134,6 @@ public class BoardServiceImpl implements BoardService {
         member.setBoard(board);
         member.setUser(user);
         member.setRole(role != null && !role.trim().isEmpty() ? role : "MEMBER");
-        board.getMembers().add(member);
+        boardMemberRepository.save(member);
     }
 }
