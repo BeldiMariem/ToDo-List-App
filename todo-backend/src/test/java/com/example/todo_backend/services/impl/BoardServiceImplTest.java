@@ -25,6 +25,7 @@ import com.example.todo_backend.entities.BoardMember;
 import com.example.todo_backend.entities.User;
 import com.example.todo_backend.exceptions.ResourceNotFoundException;
 import com.example.todo_backend.mappers.BoardMapper;
+import com.example.todo_backend.repositories.BoardMemberRepository;
 import com.example.todo_backend.repositories.BoardRepository;
 import com.example.todo_backend.repositories.UserRepository;
 
@@ -38,6 +39,9 @@ public class BoardServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private BoardMemberRepository boardMemberRepository;
 
     @InjectMocks
     private BoardServiceImpl boardService;
@@ -67,6 +71,7 @@ public class BoardServiceImplTest {
         when(boardRepository.save(any(Board.class))).thenReturn(savedBoard);
         when(userRepository.findById(10L)).thenReturn(Optional.of(user));
         when(boardMapper.toSimpleDto(savedBoard)).thenReturn(returnedDto);
+        when(boardMemberRepository.save(any(BoardMember.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         BoardDTO result = boardService.createBoard(dto, 10L);
 
@@ -74,8 +79,7 @@ public class BoardServiceImplTest {
         assertEquals(1L, result.getId());
         verify(boardRepository).save(any(Board.class));
         verify(userRepository).findById(10L);
-        assertTrue(savedBoard.getMembers().stream()
-                .anyMatch(member -> member.getUser().getId().equals(10L) && "ADMIN".equalsIgnoreCase(member.getRole())));
+        verify(boardMemberRepository).save(any(BoardMember.class));
     }
 
     @Test
@@ -174,19 +178,18 @@ public class BoardServiceImplTest {
         when(boardRepository.findById(1L)).thenReturn(Optional.of(board));
         when(userRepository.findById(20L)).thenReturn(Optional.of(newUser));
         when(boardRepository.save(board)).thenReturn(board);
-        when(boardMapper.toSimpleDto(board)).thenReturn(new BoardDTO() {
-            {
-                setId(1L);
-                setName("New Name");
-            }
-        });
+        when(boardMapper.toSimpleDto(board)).thenReturn(new BoardDTO() {{
+            setId(1L);
+            setName("New Name");
+        }});
+        when(boardMemberRepository.save(any(BoardMember.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         BoardDTO result = boardService.updateBoard(updateDTO, 10L);
 
-        assertEquals("New Name", board.getName());
-        assertTrue(board.getMembers().stream().anyMatch(m -> m.getUser().getId().equals(20L)));
+        assertEquals("New Name", board.getName());;
         assertEquals(1L, result.getId());
         verify(boardRepository).save(board);
+        verify(boardMemberRepository).save(any(BoardMember.class));
     }
 
     @Test

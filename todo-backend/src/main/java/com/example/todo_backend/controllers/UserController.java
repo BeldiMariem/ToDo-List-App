@@ -63,7 +63,6 @@ public class UserController {
             return ((CustomUserDetails) userDetails).getUser().getId();
         }
 
-        // ✅ Fallback : chercher l’utilisateur dans la base par son username
         return userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalStateException("User not found"))
                 .getId();

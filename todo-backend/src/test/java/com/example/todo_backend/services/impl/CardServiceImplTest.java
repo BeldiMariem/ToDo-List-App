@@ -19,12 +19,15 @@ import org.mockito.MockitoAnnotations;
 
 import com.example.todo_backend.dtos.CardDTO;
 import com.example.todo_backend.entities.Card;
+import com.example.todo_backend.entities.CardMember;
 import com.example.todo_backend.entities.ListEntity;
 import com.example.todo_backend.entities.User;
 import com.example.todo_backend.exceptions.ResourceNotFoundException;
 import com.example.todo_backend.mappers.CardMapper;
+import com.example.todo_backend.repositories.CardMemberRepository;
 import com.example.todo_backend.repositories.CardRepository;
 import com.example.todo_backend.repositories.ListEntityRepository;
+import com.example.todo_backend.repositories.UserRepository;
 
 public class CardServiceImplTest {
 
@@ -36,6 +39,12 @@ public class CardServiceImplTest {
 
     @Mock
     private CardMapper cardMapper;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private CardMemberRepository cardMemberRepository;
 
     @InjectMocks
     private CardServiceImpl cardService;
@@ -49,20 +58,14 @@ public class CardServiceImplTest {
     void createCard_shouldSaveAndReturnDto() {
         ListEntity list = new ListEntity();
         list.setId(1L);
-        
+
         User user = new User();
         user.setId(10L);
-
 
         CardDTO cardDTO = new CardDTO();
         cardDTO.setTitle("New Card");
         cardDTO.setDescription("Description");
         cardDTO.setListId(1L);
-
-        Card cardToSave = new Card();
-        cardToSave.setTitle(cardDTO.getTitle());
-        cardToSave.setDescription(cardDTO.getDescription());
-        cardToSave.setList(list);
 
         Card savedCard = new Card();
         savedCard.setId(10L);
@@ -77,15 +80,18 @@ public class CardServiceImplTest {
         savedDto.setListId(1L);
 
         when(listRepository.findById(1L)).thenReturn(Optional.of(list));
+        when(userRepository.findById(10L)).thenReturn(Optional.of(user));
         when(cardRepository.save(any(Card.class))).thenReturn(savedCard);
         when(cardMapper.toDto(savedCard)).thenReturn(savedDto);
+        when(cardMemberRepository.save(any(CardMember.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CardDTO result = cardService.createCard(cardDTO,user.getId());
+        CardDTO result = cardService.createCard(cardDTO, user.getId());
 
         assertNotNull(result);
         assertEquals(10L, result.getId());
         assertEquals("New Card", result.getTitle());
         verify(cardRepository).save(any(Card.class));
+        verify(cardMemberRepository).save(any(CardMember.class));
     }
 
     @Test

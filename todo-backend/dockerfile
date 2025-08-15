@@ -9,9 +9,8 @@ WORKDIR /app
 
 COPY --from=builder /app/target/*.jar app.jar
 
-COPY src/main/resources/application.properties ./application.properties
+ENV SPRING_PROFILES_ACTIVE=prod
 
-ENV SPRING_CONFIG_LOCATION=file:/app/application.properties
 
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
