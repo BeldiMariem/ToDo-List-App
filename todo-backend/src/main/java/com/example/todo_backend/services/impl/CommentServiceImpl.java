@@ -49,7 +49,6 @@ public class CommentServiceImpl implements CommentService {
 
     Comment savedComment = commentRepository.save(comment);
 
-    // Mapper en DTO pour la réponse, par exemple :
     return new CommentDTO(
         savedComment.getId(),
         savedComment.getContent(),
