@@ -14,6 +14,8 @@ This is the backend for a Trello-like task management application, containerized
 - Swagger API documentation
 - DTO separation using MapStruct
 - Controller testing using **MockMvc** and **H2 database**
+- Continuous Integration & Deployment using **Jenkins** and **Nexus**
+
 
 ## ⚙️ Tech Stack
 
@@ -27,7 +29,25 @@ This is the backend for a Trello-like task management application, containerized
 | Swagger (OpenAPI) | API documentation         |
 | JUnit & MockMvc| REST controller testing        |
 | Docker & Compose |	Containerization & orchestration |
+| Jenkins        | Continuous Integration / Continuous Deployment (CI/CD) pipelines |
+| Nexus          | Artifact repository for storing built Maven packages |
+| Docker Hub     | Container registry for Docker images |
 
+
+## 🔄 Continuous Integration & Deployment
+
+This project uses **Jenkins** to automate the backend build, test, and deployment process using a **CI/CD pipeline**.  
+
+- Automated build and test for every commit using **Maven**
+- Automated deployment to **Nexus repository**
+- Docker images are built and optionally pushed to **Docker Hub**
+- Ensures code quality and faster delivery with minimal manual steps
+
+## 🛠 CI/CD Pipeline
+
+This project uses **Jenkins** for CI/CD automation. The following screenshot shows the pipeline in action:
+
+![Jenkins Pipeline](docs/jenkins-pipeline.png)
 
 ## ✅ Controller Tests
 
@@ -35,8 +55,7 @@ All REST controllers are tested using:
 
 - `@WebMvcTest` for isolated controller tests
 - **MockMvc** to simulate HTTP requests/responses
-- **H2 database** to ensure realistic test scenarios
-
+- **H2 database** to ensure realistic test scenarios 
 
 ## 🧪 Unit Tests for Services
 In addition to controller tests, each service class has its own unit tests using JUnit and Mockito, ensuring business logic correctness in isolation.
