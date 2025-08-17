@@ -47,7 +47,7 @@ This project uses **Jenkins** to automate the backend build, test, and deploymen
 
 This project uses **Jenkins** for CI/CD automation. The following screenshot shows the pipeline in action:
 
-![Jenkins Pipeline](docs/jenkins-pipeline.png)
+![Jenkins Pipeline](/todo-backend/docs/jenkins-pipeline.png)
 
 ## ✅ Controller Tests
 
