@@ -1,0 +1,64 @@
+pipeline {
+    agent any
+
+    tools {
+        jdk 'JDK21'
+        maven 'Maven3'
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                withMaven(mavenSettingsConfig: 'maven-settings') {
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                withMaven(mavenSettingsConfig: 'maven-settings') {
+                    sh 'mvn test'
+                }
+            }
+        }
+
+        stage('Deploy to Nexus') {
+            steps {
+                withMaven(mavenSettingsConfig: 'maven-settings') {
+                    sh 'mvn deploy -DskipTests'
+                }
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                }
+            }
+        }
+
+        stage('Docker Build & Push') {
+            steps {
+                script {
+                    sh 'docker build -t todo_backend:latest .'
+                    sh 'docker tag todo_backend:latest mariem19/todo_backend:latest'
+                    sh 'docker push mariem19/todo_backend:latest'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finished.'
+        }
+        success {
+            echo '✅ Backend build & deployment successful!'
+        }
+        failure {
+            echo '❌ Something went wrong with the backend pipeline.'
+        }
+    }
+}
