@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+    tools {
+        nodejs "NodeJS20"   
+    }
+    environment {
+        DOCKER_IMAGE = "mariem19/todo_frontend"
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'GitSCM',
+                  branches: [[name: '*/main']],
+                  userRemoteConfigs: [[url: 'https://github.com/BeldiMariem/ToDo-List-App.git']]
+                ])
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                dir("todo-frontend") {
+                    sh 'npm install' 
+                }
+            }
+        }
+
+        stage('Lint') {
+            steps {
+                dir("todo-frontend") {
+                    sh 'npm run lint'
+                }
+            }
+        }
+
+        stage('Build Angular') {
+            steps {
+                dir("todo-frontend") {
+                    sh 'ng build --configuration production'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Frontend pipeline completed successfully!'
+        }
+        failure {
+            echo '❌ Frontend pipeline failed. Please check logs.'
+        }
+    }
+}
