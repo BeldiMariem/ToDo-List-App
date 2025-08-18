@@ -1,17 +1,23 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'maven:3.9.3-eclipse-temurin-21' 
+            args '-v $HOME/.m2:/root/.m2' 
+        }
+    }
+
+    environment {
+        DOCKER_IMAGE = 'mariem19/todo_backend'
+        APP_DIR = 'todo-backend'
+    }
 
     options {
-        skipStagesAfterUnstable()
         timestamps()
+        buildDiscarder(logRotator(daysToKeepStr: '30', numToKeepStr: '10'))
     }
 
     triggers {
         githubPush() 
-    }
-
-    environment {
-        MAVEN_OPTS = "-Dmaven.test.failure.ignore=false"
     }
 
     stages {
@@ -23,77 +29,64 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mvn clean compile'
+                dir("${APP_DIR}") {
+                    sh 'mvn clean package -DskipTests'
+                }
             }
         }
 
         stage('Unit Tests') {
             steps {
-                sh 'mvn test -Dspring.profiles.active=test'
+                dir("${APP_DIR}") {
+                    sh 'mvn test -Dspring.profiles.active=test'
+                }
             }
             post {
                 always {
-                    junit 'target/surefire-reports/*.xml'
+                    junit "${APP_DIR}/target/surefire-reports/*.xml"
                 }
             }
         }
 
-        stage('Package') {
-            when {
-                branch pattern: "dev|recette|main", comparator: "REGEXP"
-            }
-            steps {
-                sh 'mvn package -DskipTests'
-                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-            }
-        }
 
-        stage('Deploy to Dev') {
-            when {
-                branch 'dev'
-            }
-            steps {
-                echo "Deploying to Dev environment..."
-                sh './scripts/deploy-dev.sh'
-            }
-        }
-
-        stage('Deploy to Recette') {
-            when {
-                branch 'release'
-            }
-            steps {
-                echo "Deploying to Release (staging) environment..."
-                sh './scripts/deploy-release.sh'
-            }
-        }
-
-        stage('Deploy to Production') {
+        stage('Deploy to Nexus') {
             when {
                 branch 'main'
             }
             steps {
-                echo "Deploying to Production..."
-                sh './scripts/deploy-prod.sh'
+                dir("${APP_DIR}") {
+                    withMaven(mavenSettingsConfig: 'maven-settings') {
+                        sh 'mvn deploy -DskipTests'
+                    }
+                }
             }
         }
 
-        stage('Publish to Nexus') {
+        stage('Docker Build & Push') {
             when {
                 branch 'main'
             }
             steps {
-                sh 'mvn deploy -DskipTests'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh """
+                        echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
+                        docker build -t ${DOCKER_IMAGE}:latest ./${APP_DIR}
+                        docker push ${DOCKER_IMAGE}:latest
+                    """
+                }
             }
         }
     }
 
     post {
+        always {
+            echo 'Pipeline finished.'
+        }
         success {
-            echo "✅ Pipeline completed successfully!"
+            echo '✅ Backend build & deployment successful!'
         }
         failure {
-            echo "❌ Pipeline failed. Please check logs."
+            echo '❌ Something went wrong with the backend pipeline.'
         }
     }
 }
