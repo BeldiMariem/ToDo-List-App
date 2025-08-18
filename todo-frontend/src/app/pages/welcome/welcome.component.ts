@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./welcome.component.scss']
 })
 export class WelcomeComponent {
-  constructor(private router: Router) {}
+  private router = inject(Router);
 
   goToLogin() {
     this.router.navigate(['/login']);
@@ -24,6 +24,4 @@ export class WelcomeComponent {
     event.preventDefault();
     this.router.navigate(['/privacy']);
   }
-
-
 }
