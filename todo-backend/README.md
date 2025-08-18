@@ -44,6 +44,7 @@ This project uses **Jenkins** to automate the backend build, test, and deploymen
 - Branch-specific stages: only main triggers deployment and Docker push
 - Ensures code quality and faster delivery with minimal manual steps
 
+
 ## 🛠 CI/CD Pipeline
 
 To make sure our backend is always up-to-date, tested, and ready to deploy, I set up a **Jenkins pipeline** that automates most of the work for us. Here’s how it works:
@@ -187,4 +188,4 @@ spring.test.database.replace=any
     Isolated JWT settings for test mode
 ##
 
-###  👩‍💻 Developed with ❤️ by Mariem BELDI
+###  👩‍💻 Developed with ❤️ by Mariem BELDI.
