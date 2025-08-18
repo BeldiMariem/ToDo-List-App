@@ -1,74 +1,99 @@
 pipeline {
     agent any
 
-    tools {
-        jdk 'JDK21'
-        maven 'Maven3'
+    options {
+        skipStagesAfterUnstable()
+        timestamps()
+    }
+
+    triggers {
+        githubPush() 
+    }
+
+    environment {
+        MAVEN_OPTS = "-Dmaven.test.failure.ignore=false"
     }
 
     stages {
-
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
 
         stage('Build') {
             steps {
-                dir('todo-backend') {
-                    withMaven(mavenSettingsConfig: 'maven-settings') {
-                        sh 'mvn clean package -DskipTests'
-                    }
+                sh 'mvn clean compile'
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                sh 'mvn test -Dspring.profiles.active=test'
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
                 }
             }
         }
 
-        stage('Test') {
+        stage('Package') {
+            when {
+                branch pattern: "dev|recette|main", comparator: "REGEXP"
+            }
             steps {
-                dir('todo-backend') {
-                    withMaven(mavenSettingsConfig: 'maven-settings') {
-                        sh 'mvn test'
-                    }
-                }
+                sh 'mvn package -DskipTests'
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
         }
 
-        stage('Deploy to Nexus') {
+        stage('Deploy to Dev') {
+            when {
+                branch 'dev'
+            }
             steps {
-                dir('todo-backend') {
-                    withMaven(mavenSettingsConfig: 'maven-settings') {
-                        sh 'mvn deploy -DskipTests'
-                    }
-                }
+                echo "Deploying to Dev environment..."
+                sh './scripts/deploy-dev.sh'
             }
         }
 
-        
-        stage('Docker Login') {
+        stage('Deploy to Recette') {
+            when {
+                branch 'release'
+            }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                }
+                echo "Deploying to Release (staging) environment..."
+                sh './scripts/deploy-release.sh'
             }
         }
 
-        stage('Docker Build & Push') {
+        stage('Deploy to Production') {
+            when {
+                branch 'main'
+            }
             steps {
-                script {
-                    sh 'docker build -t todo_backend:latest ./todo-backend'
-                    sh 'docker tag todo_backend:latest mariem19/todo_backend:latest'
-                    sh 'docker push mariem19/todo_backend:latest'
-                }
+                echo "Deploying to Production..."
+                sh './scripts/deploy-prod.sh'
+            }
+        }
+
+        stage('Publish to Nexus') {
+            when {
+                branch 'main'
+            }
+            steps {
+                sh 'mvn deploy -DskipTests'
             }
         }
     }
 
     post {
-        always {
-            echo 'Pipeline finished.'
-        }
         success {
-            echo '✅ Backend build & deployment successful!'
+            echo "✅ Pipeline completed successfully!"
         }
         failure {
-            echo '❌ Something went wrong with the backend pipeline.'
+            echo "❌ Pipeline failed. Please check logs."
         }
     }
 }
-
