@@ -1,23 +1,15 @@
-import { Component } from '@angular/core';
+import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/auth/auth.service';
 import { LoginRequest } from '../../core/auth/auth.models';
 
-@Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
-})
 export class LoginComponent {
-  username: string = '';
-  password: string = '';
-  token: string | null = null;
+  authService = inject(AuthService);
+  router = inject(Router);
 
-  constructor(private authService: AuthService, private router: Router) {}
+  username = '';
+  password = '';
+  token: string | null = null;
 
   onSubmit() {
     const payload: LoginRequest = {
@@ -26,8 +18,6 @@ export class LoginComponent {
     };
     this.authService.login(payload);
     this.token = this.authService.token();
-
-
   }
 
   forgotPassword(event: Event) {
