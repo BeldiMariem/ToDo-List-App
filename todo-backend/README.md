@@ -39,13 +39,50 @@ This is the backend for a Trello-like task management application, containerized
 This project uses **Jenkins** to automate the backend build, test, and deployment process using a **CI/CD pipeline**.  
 
 - Automated build and test for every commit using **Maven**
-- Automated deployment to **Nexus repository**
-- Docker images are built and optionally pushed to **Docker Hub**
+- Automated deployment to **Nexus repository** for main branch builds
+- Docker images are built and pushed to **Docker Hub** for main branch builds
+- Branch-specific stages: only main triggers deployment and Docker push
 - Ensures code quality and faster delivery with minimal manual steps
 
 ## 🛠 CI/CD Pipeline
 
-The following screenshot shows the pipeline in action:
+To make sure our backend is always up-to-date, tested, and ready to deploy, I set up a **Jenkins pipeline** that automates most of the work for us. Here’s how it works:
+
+1. **Build**  
+   First, Jenkins compiles the project using Maven. I skip the tests at this stage to make the build faster—no one likes waiting too long for a simple compilation.
+
+2. **Unit Tests**  
+   Next, all the service classes and business logic are tested in an isolated environment using an **H2 in-memory database**. This ensures that any code we write behaves as expected before it ever reaches production.
+
+3. **Deploy to Nexus**  
+   Once everything passes, if the commit is on the **main branch**, the pipeline automatically deploys the built artifacts to **Nexus**. This way, our Maven packages are safely stored and versioned, ready for other projects or future use.
+
+
+4. **Docker Build & Push**  
+   At the same time, Jenkins builds a **Docker image** for the backend and pushes it to **Docker Hub**, but only from the main branch. This ensures that our production-ready image is always up-to-date without accidentally overwriting in-progress feature branches.
+
+
+5. **Post Actions**  
+   Finally, Jenkins prints clear messages in the logs to show whether everything succeeded or if something went wrong. This makes it easy to track the pipeline status at a glance.
+
+### **Branch Behavior**
+
+- **`main` branch** → Triggers deployment to **Nexus** and Docker image push.  
+- **Other branches** → Only builds and runs tests. This prevents unfinished work from affecting production.
+
+### **Credentials Required in Jenkins**
+
+To make this all work smoothly, Jenkins uses:
+
+- **Maven settings (`maven-settings`)** → For authenticating and deploying to Nexus.  
+- **Docker Hub credentials (`dockerhub-credentials`)** → For logging in and pushing Docker images.
+
+### **Why This Setup?**
+
+I designed it this way to minimize manual steps, prevent mistakes, and ensure that the backend is always tested, packaged, and ready to run. Every commit is either verified in a test environment or fully deployed, depending on the branch. It’s all about **speed, reliability, and confidence** in the code.
+
+
+### **Pipeline Screenshot**
 
 ![Jenkins Pipeline](/todo-backend/docs/jenkins-pipeline.png)
 
