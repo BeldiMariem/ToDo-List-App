@@ -66,24 +66,30 @@ To make sure our backend is always up-to-date, tested, and ready to deploy, I se
 5. **Post Actions**  
    Finally, Jenkins prints clear messages in the logs to show whether everything succeeded or if something went wrong. This makes it easy to track the pipeline status at a glance.
 
-### **Branch Behavior**
+## 🌱 Branch Behavior
 
 - **`main` branch** → Triggers deployment to **Nexus** and Docker image push.  
 - **Other branches** → Only builds and runs tests. This prevents unfinished work from affecting production.
 
-### **Credentials Required in Jenkins**
+## 🔑 Credentials Required in Jenkins
 
 To make this all work smoothly, Jenkins uses:
 
 - **Maven settings (`maven-settings`)** → For authenticating and deploying to Nexus.  
 - **Docker Hub credentials (`dockerhub-credentials`)** → For logging in and pushing Docker images.
 
-### **Why This Setup?**
+## 🌍 GitHub Webhook with ngrok
+
+Since Jenkins is running locally, GitHub cannot reach it directly on `http://localhost:8080`.  
+To solve this, I used **ngrok** to expose Jenkins over the internet.
+This lets GitHub send webhook events (pushes, PRs, etc.) to my local Jenkins as if it were on a real server. 🚀
+
+## 💡Why This Setup?
 
 I designed it this way to minimize manual steps, prevent mistakes, and ensure that the backend is always tested, packaged, and ready to run. Every commit is either verified in a test environment or fully deployed, depending on the branch. It’s all about **speed, reliability, and confidence** in the code.
 
 
-### **Pipeline Screenshot**
+## 📸 Pipeline Screenshot
 
 ![Jenkins Pipeline](/todo-backend/docs/jenkins-pipeline.png)
 
