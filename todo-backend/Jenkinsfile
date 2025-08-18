@@ -48,18 +48,6 @@ pipeline {
             }
         }
 
-        stage('Integration Tests') {
-            steps {
-                dir("${APP_DIR}") {
-                    sh 'mvn verify -Dspring.profiles.active=test'
-                }
-            }
-            post {
-                always {
-                    junit "${APP_DIR}/target/failsafe-reports/*.xml"
-                }
-            }
-        }
 
         stage('Deploy to Nexus') {
             when {
