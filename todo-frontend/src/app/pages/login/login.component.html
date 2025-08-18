@@ -9,7 +9,7 @@
         <label for="username">Username</label>
         <input
           id="username"
-          type="username"
+          type="text"
           [(ngModel)]="username"
           name="username"
           placeholder="Enter your username"
@@ -30,18 +30,31 @@
       </div>
 
       <div class="form-options">
-        <a class="forgot-link" (click)="forgotPassword($event)">Forgot password</a>
+        <button
+          type="button"
+          class="forgot-link"
+          (click)="forgotPassword($event)"
+        >
+          Forgot password
+        </button>
       </div>
 
       <button type="submit" class="login-button">Sign in</button>
 
       <div class="signup-prompt">
         Don’t have an account?
-        <a (click)="goToRegister($event)">Sign up</a>
+        <button
+          type="button"
+          class="signup-link"
+          (click)="goToRegister($event)"
+        >
+          Sign up
+        </button>
       </div>
     </form>
   </div>
 
+  <!-- Right: Illustration -->
   <div class="login-right">
     <img
       src="https://media.istockphoto.com/id/1219250750/vector/online-registration-and-sign-up-concept-people-signing-up-or-login-to-online-account-with.jpg?s=612x612&w=0&k=20&c=1IEI_a33YhMHcZorJNzA5ECND__5WiILMHErwlWsu6E="
