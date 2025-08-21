@@ -39,7 +39,7 @@ export class AuthService {
       .subscribe({
         next: (res) => {
           this._state.set({ token: res.token, loading: false, error: null });
-          this.router.navigateByUrl('/');
+          this.router.navigateByUrl('/boards');
         },
         error: (err) => {
           const msg = err?.error?.message || 'Login failed';

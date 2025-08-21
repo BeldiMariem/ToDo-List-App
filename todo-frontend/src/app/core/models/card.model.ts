@@ -1,4 +1,4 @@
-import { UserDTO } from "../user/user-dto.model";
+import { UserDTO } from "./user/user-dto.model";
 
 export interface CardDTO {
   id: number;

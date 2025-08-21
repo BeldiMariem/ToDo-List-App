@@ -57,6 +57,7 @@ public class BoardServiceImpl implements BoardService {
                 .orElseThrow(() -> new ResourceNotFoundException("Board", "id", id));
     }
 
+
     @Override
     public void deleteBoard(Long id) {
         if (!boardRepository.existsById(id)) {

@@ -1,0 +1,71 @@
+<div class="sidebar" [class.collapsed]="isCollapsed">
+  <div class="sidebar-header">
+    <div class="logo">
+      <span >Todo UI</span>
+    </div>
+    <button class="toggle-btn" (click)="toggleSidebar()">
+      <i class="fas" [class.fa-chevron-left]="!isCollapsed" [class.fa-chevron-right]="isCollapsed"></i>
+    </button>
+  </div>
+
+  <div class="user-profile" >
+    <div class="avatar">
+      <img src="https://static.vecteezy.com/system/resources/previews/022/450/297/non_2x/3d-minimal-purple-user-profile-avatar-icon-in-circle-white-frame-design-vector.jpg" alt="User Avatar">
+    </div>
+    <div class="user-info">
+      <h3>{{ userName }}</h3>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <ul class="nav-menu">
+      <li [class.active]="dashboardActive" (click)="selectMenuItem('dashboard')">
+        <i class="fas fa-grid"></i>
+        <span>Dashboard</span>
+      </li>
+      
+      <li [class.active]="projectsActive" (click)="selectMenuItem('projects')">
+        <i class="fas fa-folder"></i>
+        <span>Projects</span>
+      </li>
+      
+      <li [class.active]="tasksActive" (click)="selectMenuItem('tasks')">
+        <i class="fas fa-check-square"></i>
+        <span>Tasks</span>
+      </li>
+      
+      <li [class.active]="calendarActive" (click)="selectMenuItem('calendar')">
+        <i class="fas fa-calendar"></i>
+        <span>Calendar</span>
+      </li>
+      
+      <li [class.active]="teamActive" (click)="selectMenuItem('team')">
+        <i class="fas fa-users"></i>
+        <span>Team</span>
+      </li>
+      
+      <li [class.active]="documentsActive" (click)="selectMenuItem('documents')">
+        <i class="fas fa-file-text"></i>
+        <span>Documents</span>
+      </li>
+      
+
+      
+      <li [class.active]="settingsActive" (click)="selectMenuItem('settings')">
+        <i class="fas fa-settings"></i>
+        <span>Settings</span>
+      </li>
+    </ul>
+
+    <ul class="nav-menu bottom-menu">
+
+      
+      <li [class.active]="logoutActive" (click)="selectMenuItem('logout')">
+        <i class="fas fa-log-out"></i>
+        <span>Logout</span>
+      </li>
+    </ul>
+  </nav>
+
+  
+</div>

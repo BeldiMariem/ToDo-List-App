@@ -25,6 +25,7 @@ export class LoginComponent {
       username: this.username,
       password: this.password
     };
+    
     this.authService.login(payload);
     this.token = this.authService.token();
   }
