@@ -2,8 +2,8 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../core/auth/auth.service';
-import { LoginRequest } from '../../core/auth/auth.models';
+import { AuthService } from '../../core/services/auth.service';
+import { LoginRequest } from '../../core/models/auth/login-request.model';
 
 @Component({
   selector: 'app-login',
@@ -25,6 +25,7 @@ export class LoginComponent {
       username: this.username,
       password: this.password
     };
+    
     this.authService.login(payload);
     this.token = this.authService.token();
   }

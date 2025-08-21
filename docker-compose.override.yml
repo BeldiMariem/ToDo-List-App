@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./todo-backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./todo-backend/src:/app/src
+      - ./todo-backend/pom.xml:/app/pom.xml
+      - ~/.m2:/root/.m2
+    command: mvn spring-boot:run
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./todo-frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./todo-frontend:/app
+      - /app/node_modules
+    command: npm start
+    ports:
+        - "4201:4200"

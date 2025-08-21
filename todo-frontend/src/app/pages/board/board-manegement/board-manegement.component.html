@@ -1,0 +1,28 @@
+<div class="boards-container">
+  <h2>Your Boards</h2>
+
+  @if (boardService.boards().length > 0) {
+    <div class="board-list">
+      @for (board of boardService.boards(); track board.id) {
+        <div class="board-card" (click)="openBoard(board.id)">
+          <div class="board-content">
+            <h3>{{ board.name }}</h3>
+          </div>
+        </div>
+      }
+
+      <div class="board-card create-board" (click)="createBoard()">
+        <span class="plus">+</span>
+        <p>Create New Board</p>
+      </div>
+    </div>
+  } @else {
+
+    <div class="empty-state">
+      <img src="https://cdn-icons-png.flaticon.com/256/512/512702.png" alt="No Boards">
+      <h3>No Boards Yet</h3>
+      <p>Start by creating your first board and organize your work like a pro 🚀</p>
+      <button class="create-first-btn" (click)="createBoard()">+ Create Your First Board</button>
+    </div>
+  }
+</div>

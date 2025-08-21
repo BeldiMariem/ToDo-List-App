@@ -1,5 +1,7 @@
 package com.example.todo_backend.controllers;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,14 +31,14 @@ public class BoardController {
     @PostMapping("/createBoard")
     public ResponseEntity<BoardDTO> createBoard(@RequestBody BoardDTO boardDTO) {
         Long userId = authenticationService.getCurrentUserId();
-         System.out.println("Creating board for user ID: " + userId);
+        System.out.println("Creating board for user ID: " + userId);
 
         return ResponseEntity.ok(boardService.createBoard(boardDTO, userId));
     }
 
     @PutMapping("/updateBoard")
     public ResponseEntity<BoardDTO> updateBoard(
-        @RequestBody BoardUpdateDTO updateDTO) {
+            @RequestBody BoardUpdateDTO updateDTO) {
         Long userId = authenticationService.getCurrentUserId();
         return ResponseEntity.ok(boardService.updateBoard(updateDTO, userId));
     }
@@ -44,6 +46,12 @@ public class BoardController {
     @GetMapping("/getBoard/{id}")
     public ResponseEntity<BoardDTO> getBoardById(@PathVariable Long id) {
         return ResponseEntity.ok(boardService.getBoardById(id));
+    }
+
+    @GetMapping("/getBoardByUser")
+    public ResponseEntity<List<BoardDTO>> getBoardsByUserId() {
+        Long userId = authenticationService.getCurrentUserId();
+        return ResponseEntity.ok(boardService.getBoardsByUserId(userId));
     }
 
     @DeleteMapping("/deleteBoard/{id}")
