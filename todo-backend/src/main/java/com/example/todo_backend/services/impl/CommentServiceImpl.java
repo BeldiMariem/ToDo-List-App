@@ -76,22 +76,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
 
-    private Card findCardById(Long cardId) {
-        return cardRepository.findById(cardId)
-                .orElseThrow(() -> new ResourceNotFoundException("Card", "id", cardId));
-    }
 
-    private User findUserById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-    }
-
-    private Comment buildComment(CommentDTO dto, Card card, User user) {
-        Comment comment = new Comment();
-        comment.setContent(dto.getContent());
-        comment.setCard(card);
-        comment.setUser(user);
-        comment.setCreatedAt(LocalDateTime.now());
-        return comment;
-    }
+  
 }
