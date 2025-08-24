@@ -1,6 +1,4 @@
-/* Reset default browser styles */
 :host {
-  display: block;
   margin: 0;
   padding: 0;
   top:0;
@@ -8,23 +6,21 @@
 }
 
 .sidebar {
-  width: 280px;
+  width: 270px;
   height: 100vh;
   background: #533285;
   color: #f8f9fa;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
-  position: fixed;  
+  transition: width 0.3s ease;  
   border-right: 1px solid #3a3a4a;
   margin: 0;
   padding: 0;
   top:0;
   left:0;
-  box-sizing: border-box;
 
   &.collapsed {
-    width: 80px;
+    width: 60px;
 
     .logo span,
     .user-profile,

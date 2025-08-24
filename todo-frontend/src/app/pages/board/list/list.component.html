@@ -1,0 +1,46 @@
+<div cdkDropList [cdkDropListData]="list.cards"
+     (cdkDropListDropped)="drop.emit($event)" 
+     class="list" 
+     [style.borderTopColor]="list.color">
+
+  <div class="list-header">
+    <div class="list-title">
+      <div class="color-badge" [style.backgroundColor]="list.color"></div>
+      <h3>{{ list.name }}</h3>
+    </div>
+    <div class="list-actions">
+      <span class="badge" [style.backgroundColor]="list.color">{{ list.cards.length }}</span>
+      <button class="btn-icon btn-delete" (click)="delete.emit(list.id)" title="Delete List">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="cards">
+<app-card *ngFor="let card of list.cards" 
+         [card]="card" 
+         [listId]="list.id"
+         [currentUser]="currentUser"
+         [isCommentsOpen]="isCommentsOpen(card.id)"
+         (delete)="onDeleteCard($event)"
+         (toggleComments)="onToggleCardComments($event)"
+         (addComment)="onAddComment($event)" 
+         (deleteComment)="onDeleteCardComment($event)">
+</app-card>
+  </div>
+
+  <div *ngIf="activeListId === list.id" class="add-card-form">
+    <input type="text" placeholder="Task title" [(ngModel)]="newCardTitle" class="form-input">
+    <textarea placeholder="Description" [(ngModel)]="newCardDescription" class="form-textarea"></textarea>
+    <div class="form-actions">
+      <button (click)="onAddCard()" class="btn-add">Add Task</button>
+      <button (click)="cancelAddCard.emit()" class="btn-cancel">Cancel</button>
+    </div>
+  </div>
+
+  <div class="add-card-footer" *ngIf="activeListId !== list.id">
+    <button (click)="showAddCardForm.emit(list.id)" class="add-card-btn">
+      <i class="fas fa-plus"></i> Add Task
+    </button>
+  </div>
+</div>

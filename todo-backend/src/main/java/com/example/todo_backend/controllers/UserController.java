@@ -4,6 +4,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +20,7 @@ import com.example.todo_backend.security.CustomUserDetails;
 import com.example.todo_backend.services.UserService;
 
 import lombok.RequiredArgsConstructor;
+
 
 @RestController
 @RequestMapping("/api/users")
@@ -66,5 +69,11 @@ public class UserController {
         return userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalStateException("User not found"))
                 .getId();
+    }
+    @GetMapping ("/getUserByUsername/{username}")
+    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
+
+        UserDTO userDTO = userService.getUserByUsername(username);
+        return ResponseEntity.ok(userDTO);
     }
 }

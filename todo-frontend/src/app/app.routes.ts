@@ -14,7 +14,7 @@ export const routes: Routes = [
     component: MainLayoutComponent, 
     children: [
       { path: 'boards', loadComponent: () => import('../app/pages/board/board-manegement/board-manegement.component').then(m => m.BoardManegementComponent) },
-      //{ path: 'board/:id', loadComponent: () => import('../app/pages/board/board.component').then(m => m.BoardComponent) }
+      { path: 'board-detail/:id', loadComponent: () => import('../app/pages/board/board-detail/board-detail.component').then(m => m.BoardDetailComponent) }
     ]
   }
 

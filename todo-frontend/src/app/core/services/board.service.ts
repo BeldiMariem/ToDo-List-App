@@ -28,12 +28,14 @@ export class BoardService {
       },
     });
   }
-
+  getBoard(id: number) {
+    return this.http.get<BoardDTO>(`${environment.apiUrl}/boards/getBoard/${id}`);
+  }
   createBoard(payload: Partial<BoardDTO>) {
-    return this.http.post<BoardDTO>(`${environment.apiUrl}/boards`, payload);
+    return this.http.post<BoardDTO>(`${environment.apiUrl}/boards/createBoard`, payload);
   }
 
   deleteBoard(id: number) {
-    return this.http.delete(`${environment.apiUrl}/boards/${id}`);
+    return this.http.delete(`${environment.apiUrl}/boards/deleteBoard/${id}`);
   }
 }

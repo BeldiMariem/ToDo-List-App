@@ -1,0 +1,60 @@
+<div class="board-container">
+    <header class="board-header">
+        <h1>{{ board?.name || 'Project Dashboard' }}</h1>
+
+        <div class="header-actions">
+            <button class="btn-primary">
+                <i class="fas fa-plus"></i> New member
+            </button>
+            <div class="view-options">
+                <button class="btn-icon active"><i class="fas fa-th-large"></i></button>
+                <button class="btn-icon"><i class="fas fa-list"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <div class="stats-bar">
+        <div class="stat-item stat-item-total">
+            <span class="stat-number">{{ getTotalTasks() }}</span>
+            <span class="stat-label">Total Tasks</span>
+        </div>
+
+        <div class="stat-item" *ngFor="let list of lists" [style.borderLeftColor]="list.color">
+            <span class="stat-number">{{ list.cards.length }}</span>
+            <span class="stat-label">{{ list.name }}</span>
+        </div>
+    </div>
+
+<div cdkDropListGroup class="board">
+    <app-list *ngFor="let list of lists" 
+            [list]="list" 
+            [activeListId]="activeListId"
+            [currentUser]="currentUser"
+            [openCommentCards]="openCommentCards"
+            (delete)="onDeleteList($event)"
+            (showAddCardForm)="onShowAddCardForm($event)"
+            (addCard)="onAddCard($event)"
+            (cancelAddCard)="onCancelAddCard()"
+            (drop)="onDrop($event, list.id)"
+            (deleteCard)="onDeleteCard($event.cardId, $event.listId)"
+            (toggleCardComments)="onToggleCardComments($event)"
+            (addComment)="onAddComment($event)"
+            (deleteCardComment)="onDeleteCardComment($event)"> 
+    </app-list>
+  
+  <div class="add-new-list">
+    <div *ngIf="!showAddListForm" class="add-list-btn" (click)="showAddListForm = true">
+      <i class="fas fa-plus"></i> Add List
+    </div>
+
+    <div *ngIf="showAddListForm" class="add-list-form">
+      <input type="text" placeholder="List name" [(ngModel)]="newListName" class="form-input">
+      <input type="color" [(ngModel)]="newListColor" class="form-color">
+      <div class="form-actions">
+        <button (click)="addList()" class="btn-add">Add List</button>
+        <button (click)="cancelAddList()" class="btn-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

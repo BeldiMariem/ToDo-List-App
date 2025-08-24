@@ -1,18 +1,16 @@
 .main-layout {
   display: flex;
   height: 100vh;
-
+  background-color:#533285;
   app-sidebar {
-    width: 250px;
-    min-width: 250px;
-    background-color: #f9f9f9; 
-    padding: 20px;
+    flex-shrink: 0;
+    transition: width 0.3s ease;
   }
 
   .content {
-    flex: 1; 
-    padding: 20px;
+    flex: 1;
     background-color: #f9f9f9;
     overflow-y: auto;
+    transition: margin-left 0.3s ease;
   }
 }

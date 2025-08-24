@@ -1,5 +1,8 @@
-import { Component, Output, EventEmitter } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+// sidebar.component.ts
+import { Component, Output, EventEmitter, inject, Input } from '@angular/core';
+import { UserDTO } from '../../core/models/user/user-dto.model';
+import { AuthService } from '../../core/services/auth.service';
+
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
@@ -7,12 +10,13 @@ import { RouterOutlet } from '@angular/router';
 })
 export class SidebarComponent {
   @Output() menuItemSelected = new EventEmitter<string>();
-
-  isCollapsed = false;
-  userName = 'Mariem';
+  @Output() toggleSidebar = new EventEmitter<void>();
+  @Input() isCollapsed = false;
   
+  private authService = inject(AuthService);
+  currentUser!: UserDTO;  
   dashboardActive = true;
-  projectsActive = false;
+  boardsActive = false;
   tasksActive = false;
   calendarActive = false;
   teamActive = false;
@@ -21,13 +25,19 @@ export class SidebarComponent {
   settingsActive = false;
   logoutActive = false;
 
-  toggleSidebar() {
-    this.isCollapsed = !this.isCollapsed;
+  ngOnInit() {
+    const user = this.authService.getCurrentUser();
+    this.currentUser = user;
+    console.log('Current User:', this.currentUser);
+  }
+
+  onToggleSidebar() {
+    this.toggleSidebar.emit();
   }
 
   selectMenuItem(itemId: string) {
     this.dashboardActive = false;
-    this.projectsActive = false;
+    this.boardsActive = false;
     this.tasksActive = false;
     this.calendarActive = false;
     this.teamActive = false;
@@ -38,7 +48,7 @@ export class SidebarComponent {
 
     switch(itemId) {
       case 'dashboard': this.dashboardActive = true; break;
-      case 'projects': this.projectsActive = true; break;
+      case 'board': this.boardsActive = true; break;
       case 'tasks': this.tasksActive = true; break;
       case 'calendar': this.calendarActive = true; break;
       case 'team': this.teamActive = true; break;
