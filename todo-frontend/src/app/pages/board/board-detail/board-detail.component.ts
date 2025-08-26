@@ -1,25 +1,27 @@
-import { Component, OnInit, inject, OnDestroy } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy, HostListener, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkDropListGroup } from '@angular/cdk/drag-drop';
 import { ActivatedRoute } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { forkJoin, Subject, takeUntil } from 'rxjs';
 
 import { BoardDTO } from '../../../core/models/board.model';
 import { ListDTO } from '../../../core/models/list.model';
 import { CardDTO } from '../../../core/models/card.model';
 import { CommentDTO } from '../../../core/models/comment.model';
 import { UserDTO } from '../../../core/models/user/user-dto.model';
+import { BoardUpdateDTO } from '../../../core/models/board-update.model';
 
 import { CardService } from '../../../core/services/card.service';
 import { ListService } from '../../../core/services/list.service';
 import { CommentService } from '../../../core/services/comment.service';
 import { BoardService } from '../../../core/services/board.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service';
 
 import { ListComponent } from '../list/list.component';
 import { moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { FormsModule } from '@angular/forms';
 
-import { FormsModule } from '@angular/forms'; 
 interface ListWithCards extends ListDTO {
   cards: (CardDTO & { comments: CommentDTO[]; newComment: string })[];
 }
@@ -38,18 +40,36 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
   private cardService = inject(CardService);
   private commentService = inject(CommentService);
   private authService = inject(AuthService);
+  private userService = inject(UserService);
+  private changeDetectorRef = inject(ChangeDetectorRef);
   private destroy$ = new Subject<void>();
 
+
+  boardMembersWithDetails: any[] = [];
   boardId!: number;
   board: BoardDTO | null = null;
   lists: ListWithCards[] = [];
   currentUser!: UserDTO;
+  userss: UserDTO[] = [];
 
   newListName = '';
   newListColor = '#4F46E5';
   showAddListForm = false;
   activeListId: number | null = null;
   openCommentCards = new Set<number>();
+
+  showAddMemberModal = false;
+  availableUsers: UserDTO[] = [];
+  filteredUsers: UserDTO[] = [];
+  selectedUsers: UserDTO[] = [];
+  userSearchQuery = '';
+  selectedRole = 'MEMBER';
+  isAddingMember = false;
+  errorMessage = '';
+
+  isTooltipVisible = false;
+  tooltipText = '';
+  tooltipPosition = { x: 0, y: 0 };
 
   ngOnInit() {
     this.boardId = Number(this.route.snapshot.paramMap.get('id'));
@@ -62,8 +82,21 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  @HostListener('document:keydown', ['$event'])
+  onKeydownHandler(event: KeyboardEvent) {
+    if (event.key === 'Escape' && this.showAddMemberModal) {
+      this.closeAddMemberModal();
+      event.preventDefault();
+    }
+  }
+
   private loadCurrentUser() {
-    this.currentUser = this.authService.getCurrentUser();
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      this.currentUser = user;
+    } else {
+      console.error('No current user found');
+    }
   }
 
   private loadBoardData() {
@@ -73,11 +106,165 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
         next: (board) => {
           this.board = board;
           this.loadLists();
+
+          this.loadUserDetailsForMembers(board.members);
         },
         error: (error) => {
           console.error('Error loading board:', error);
         }
       });
+  }
+
+  private loadUserDetailsForMembers(members: any[]) {
+    this.boardMembersWithDetails = [];
+
+    if (!members || members.length === 0) return;
+
+    const userObservables = members.map(member =>
+      this.userService.getUserById(member.userId)
+    );
+
+    forkJoin(userObservables).subscribe({
+      next: (response: any) => {
+        const users = response as UserDTO[];
+
+        this.boardMembersWithDetails = members.map((member, index) => ({
+          ...member,
+          email: users[index]?.email || 'unknown@example.com',
+          username: users[index]?.username || 'User ' + member.userId
+        }));
+
+        if (this.availableUsers.length > 0) {
+          this.filteredUsers = this.filterOutExistingMembers(this.availableUsers);
+        }
+
+        this.changeDetectorRef.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error loading user details:', error);
+        this.boardMembersWithDetails = members.map(member => ({
+          ...member,
+          email: 'user' + member.userId + '@example.com',
+          username: 'User ' + member.userId
+        }));
+
+        if (this.availableUsers.length > 0) {
+          this.filteredUsers = this.filterOutExistingMembers(this.availableUsers);
+        }
+
+        this.changeDetectorRef.detectChanges();
+      }
+    });
+  }
+  openAddMemberModal(): void {
+    this.showAddMemberModal = true;
+    this.selectedUsers = [];
+    this.userSearchQuery = '';
+    this.selectedRole = 'MEMBER';
+    this.errorMessage = '';
+    this.loadAvailableUsers();
+  }
+
+  closeAddMemberModal(): void {
+    this.showAddMemberModal = false;
+    this.selectedUsers = [];
+    this.userSearchQuery = '';
+    this.errorMessage = '';
+  }
+
+  onBackdropClick(event: MouseEvent): void {
+    if ((event.target as Element).classList.contains('modal-backdrop')) {
+      this.closeAddMemberModal();
+    }
+  }
+
+  loadAvailableUsers(): void {
+    this.userService.getUsers().subscribe({
+      next: (users) => {
+        this.availableUsers = users;
+
+        this.filteredUsers = this.filterOutExistingMembers(users);
+      },
+      error: (error) => {
+        console.error('Error loading users:', error);
+        this.errorMessage = 'Failed to load users';
+      }
+    });
+  }
+
+  private filterOutExistingMembers(users: UserDTO[]): UserDTO[] {
+    if (!this.boardMembersWithDetails || this.boardMembersWithDetails.length === 0) {
+      return users;
+    }
+    const memberUserIds = this.boardMembersWithDetails.map(member => member.userId);
+    return users.filter(user => !memberUserIds.includes(user.id!));
+  }
+
+  filterUsers(): void {
+    if (!this.userSearchQuery) {
+      this.filteredUsers = this.filterOutExistingMembers(this.availableUsers);
+      return;
+    }
+
+    const query = this.userSearchQuery.toLowerCase();
+
+    const searchedUsers = this.availableUsers.filter(user =>
+      user.email!.toLowerCase().includes(query) ||
+      (user.username && user.username.toLowerCase().includes(query))
+    );
+
+    this.filteredUsers = this.filterOutExistingMembers(searchedUsers);
+  }
+
+
+  toggleUserSelection(user: UserDTO): void {
+    const isSelected = this.isUserSelected(user.id);
+    if (isSelected) {
+      this.selectedUsers = this.selectedUsers.filter(u => u.id !== user.id);
+    } else {
+      this.selectedUsers = [...this.selectedUsers, user];
+    }
+  }
+
+  isUserSelected(userId: number): boolean {
+    return this.selectedUsers.some(user => user.id === userId);
+  }
+
+  removeUserFromSelection(user: UserDTO): void {
+    this.selectedUsers = this.selectedUsers.filter(u => u.id !== user.id);
+  }
+
+  getUserInitials(email: string): string {
+    return email.substring(0, 2).toUpperCase();
+  }
+
+  addMembersToBoard(): void {
+    if (this.selectedUsers.length === 0 || !this.board) return;
+
+    this.isAddingMember = true;
+    this.errorMessage = '';
+
+    const payload: Partial<BoardUpdateDTO> = {
+      boardId: this.board.id,
+      userIds: this.selectedUsers.map(user => user.id),
+      role: this.selectedRole
+    };
+
+    this.boardService.updateBoard(payload).subscribe({
+      next: (updatedBoard) => {
+        this.loadBoardData();
+
+        this.isAddingMember = false;
+        this.closeAddMemberModal();
+
+        this.loadAvailableUsers();
+      },
+      error: (error) => {
+        console.error('Error adding members:', error);
+        this.errorMessage = 'Failed to add members. Please try again.';
+        this.isAddingMember = false;
+      }
+    });
   }
 
   private loadLists() {
@@ -95,6 +282,21 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
           console.error('Error loading lists:', error);
         }
       });
+  }
+
+  showTooltip(event: MouseEvent, text: string): void {
+    if (this.showAddMemberModal) return;
+
+    this.tooltipText = text;
+    this.tooltipPosition = {
+      x: event.clientX,
+      y: event.clientY - 40
+    };
+    this.isTooltipVisible = true;
+  }
+
+  hideTooltip(): void {
+    this.isTooltipVisible = false;
   }
 
   private loadCardsForLists() {
@@ -144,24 +346,24 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
     } else {
       const card = event.previousContainer.data[event.previousIndex];
       const previousList = this.lists.find(list => list.cards.some(c => c.id === card.id));
-      
+
       if (!previousList) {
         console.error('Could not find previous list for card:', card);
         return;
       }
-      
+
       const previousListId = previousList.id;
       const originalListId = card.listId;
-      
+
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,
         event.previousIndex,
         event.currentIndex
       );
-      
+
       card.listId = listId;
-      
+
       const updatePayload: Partial<CardDTO> = {
         id: card.id,
         title: card.title,
@@ -169,7 +371,7 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
         listId: listId,
         members: card.members || []
       };
-      
+
       this.cardService.updateCard(card.id, updatePayload)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
@@ -194,14 +396,14 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
     this.activeListId = listId;
   }
 
-  onAddCard(payload: {listId: number, title: string, description: string}) {
+  onAddCard(payload: { listId: number, title: string, description: string }) {
     if (!payload.title.trim()) return;
 
     const cardPayload = {
       title: payload.title,
       description: payload.description,
       listId: payload.listId,
-      members: [] 
+      members: []
     };
 
     this.cardService.createCard(cardPayload)
@@ -312,47 +514,45 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
     return this.openCommentCards.has(cardId);
   }
 
-  onAddComment(event: {card: any, listId: number}) {
-      console.log('BoardDetailComponent: Received addCardComment event', event);
+  onAddComment(event: { card: any, listId: number }) {
+    if (!event.card.newComment?.trim()) return;
 
-  if (!event.card.newComment?.trim()) return;
+    const payload: Partial<CommentDTO> = {
+      content: event.card.newComment.trim(),
+      cardId: event.card.id,
+      user: this.currentUser
+    };
 
-  const payload: Partial<CommentDTO> = {
-    content: event.card.newComment.trim(),
-    cardId: event.card.id,
-    user: this.currentUser
-  };
+    this.commentService.createComment(payload)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (newComment: CommentDTO) => {
+          const commentWithUser: CommentDTO = {
+            ...newComment,
+            user: this.currentUser
+          };
 
-  this.commentService.createComment(payload)
-    .pipe(takeUntil(this.destroy$))
-    .subscribe({
-      next: (newComment: CommentDTO) => {
-        const commentWithUser: CommentDTO = {
-          ...newComment,
-          user: this.currentUser
-        };
+          const list = this.lists.find(l => l.id === event.listId);
+          if (list) {
+            const card = list.cards.find(c => c.id === event.card.id);
+            if (card) {
+              if (!card.comments) {
+                card.comments = [];
+              }
+              card.comments.push(commentWithUser);
+              card.newComment = '';
 
-        const list = this.lists.find(l => l.id === event.listId);
-        if (list) {
-          const card = list.cards.find(c => c.id === event.card.id);
-          if (card) {
-            if (!card.comments) {
-              card.comments = [];
+              list.cards = [...list.cards];
             }
-            card.comments.push(commentWithUser);
-            card.newComment = '';
-            
-            list.cards = [...list.cards];
           }
+        },
+        error: (error) => {
+          console.error('Error adding comment:', error);
         }
-      },
-      error: (error) => {
-        console.error('Error adding comment:', error);
-      }
-    });
- }
+      });
+  }
 
-  onDeleteCardComment(event: {commentId: number, card: any, listId: number}) {
+  onDeleteCardComment(event: { commentId: number, card: any, listId: number }) {
     if (confirm('Are you sure you want to delete this comment?')) {
       this.commentService.deleteComment(event.commentId)
         .pipe(takeUntil(this.destroy$))

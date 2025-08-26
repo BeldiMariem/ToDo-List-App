@@ -1,5 +1,7 @@
 package com.example.todo_backend.services.impl;
 
+import java.util.List;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,6 +66,14 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
     }
+
+    @Override
+    @Transactional
+    public  UserDTO getUserById(Long userId){
+        User user = findUserById(userId);
+        return userMapper.toDTO(user);
+    }
+
     @Override
     @Transactional
     public UserDTO getUserByUsername(String username) {
@@ -71,5 +81,13 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
         return userMapper.toDTO(user);
     }
-   
+
+    @Override
+    public List<UserDTO> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(userMapper::toDTO)
+                .toList();
+    }
+
 }

@@ -1,5 +1,7 @@
 package com.example.todo_backend.controllers;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -74,6 +76,16 @@ public class UserController {
     public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
 
         UserDTO userDTO = userService.getUserByUsername(username);
+        return ResponseEntity.ok(userDTO);
+    }
+    @GetMapping ("/getUsers")
+    public ResponseEntity<List<UserDTO>> getUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+    
+    @GetMapping ("/getUserById/{userId}")
+    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable Long userId) {
+        UserDTO userDTO = userService.getUserById(userId);
         return ResponseEntity.ok(userDTO);
     }
 }

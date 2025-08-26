@@ -14,9 +14,9 @@ public interface BoardMemberMapper {
     @Mapping(target = "user", source = "userId")
     BoardMember toEntity(BoardMemberDTO boardMemberDTO);
     
-    @Mapping(target = "boardId", source = "board.id")
-    @Mapping(target = "userId", source = "user.id")
-    BoardMemberDTO toDto(BoardMember boardMember);
+    @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "board.id", target = "boardId")
+    BoardMemberDTO toDto(BoardMember member);
     
     default Board mapBoardIdToBoard(Long boardId) {
         if (boardId == null) return null;

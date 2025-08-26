@@ -9,7 +9,7 @@
     </button>
   </div>
 
-  <div class="user-profile" *ngIf="!isCollapsed">
+  <div class="user-profile" >
     <div class="avatar">
       <img src="https://static.vecteezy.com/system/resources/previews/022/450/297/non_2x/3d-minimal-purple-user-profile-avatar-icon-in-circle-white-frame-design-vector.jpg" alt="User Avatar">
     </div>
@@ -26,7 +26,7 @@
       </li>
       
       <li [class.active]="boardsActive" (click)="selectMenuItem('boards')">
-        <i class="fas fa-list-alt	"></i>
+        <i class="fas fa-list-che"></i>
         <span>Boards</span>
       </li>
       
@@ -44,7 +44,11 @@
         <i class="fas fa-users"></i>
         <span>Team</span>
       </li>
-    
+      
+      <li [class.active]="documentsActive" (click)="selectMenuItem('documents')">
+        <i class="fas fa-file-text"></i>
+        <span>Documents</span>
+      </li>
       
       <li [class.active]="settingsActive" (click)="selectMenuItem('settings')">
         <i class="fas fa-settings"></i>
@@ -54,7 +58,7 @@
 
     <ul class="nav-menu bottom-menu">
       <li [class.active]="logoutActive" (click)="selectMenuItem('logout')">
-        <i class="fas fa-arrow-alt-circle-left	"></i>
+        <i class="fas fa-log-out"></i>
         <span>Logout</span>
       </li>
     </ul>
