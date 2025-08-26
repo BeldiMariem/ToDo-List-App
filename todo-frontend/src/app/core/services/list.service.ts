@@ -18,4 +18,8 @@ export class ListService {
   deleteList(id: number) {
     return this.http.delete(`${environment.apiUrl}/lists/deleteList/${id}`);
   }
+  
+  updateList(payload: Partial<ListDTO>) {
+    return this.http.put<ListDTO>(`${environment.apiUrl}/lists/updateList`, payload);
+  }
 }

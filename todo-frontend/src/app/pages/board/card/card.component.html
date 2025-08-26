@@ -1,72 +1,73 @@
-<div cdkDrag class="card">
-  <div class="card-content">
-    <button class="card-delete-btn" (click)="onDelete()" title="Delete Task">
-      <i class="fas fa-times"></i>
-    </button>
-    
-    <div class="card-tags">
-      <span class="tag">backend</span>
-    </div>
-    <h4>{{ card.title }}</h4>
-    <p>{{ card.description }}</p>
-
-    <div class="card-footer">
-      <div class="card-meta">
-        <span class="meta-item comment-toggle" (click)="onToggleComments()" 
-              [class.active]="isCommentsOpen">
-          <i class="far fa-comment"></i> {{ card.comments?.length || 0 }}
-        </span>
-        <span class="meta-item"><i class="fas fa-eye"></i> </span>
-      </div>
-      <div class="assignee">
-        
-        <img src="https://ui-avatars.com/api/?name=User&background=random" alt="Assignee">
-      </div>
-    </div>
-
-    <div class="comments-section" *ngIf="isCommentsOpen">
-      <div class="comments-header">
-        <i class="far fa-comment"></i>
-        <span>{{ card.comments?.length || 0 }} comment(s)</span>
-        <button class="btn-close-comments" (click)="onToggleComments()" title="Close comments">
-          <i class="fas fa-times"></i>
+<div cdkDrag class="card" [style.borderTopColor]="color">
+    <div class="card-content">
+        <button class="card-delete-btn" (click)="onDelete()" title="Delete Task">
+            <i class="fas fa-times"></i>
         </button>
-      </div>
-      
-      <div class="comments-list" *ngIf="card.comments && card.comments.length > 0">
-        <div *ngFor="let comment of card.comments" class="comment">
-            
-          <div class="comment-header">
-            <img [src]="getUserAvatar(comment.user)" class="comment-avatar" alt="User">
-            
-            <span class="comment-author">{{ comment.user.username }}</span>
-            <span class="comment-date">{{ formatDate(comment.createdAt) }}</span>
-            
-          </div>
-          <p class="comment-content">{{ comment.content }}</p>
-          <button *ngIf="canModifyComment(comment)" 
-                  class="btn-icon btn-delete" 
-                  (click)="onDeleteComment(comment.id)"
-                  title="Delete comment">
-            <i class="fas fa-trash"></i>
-          </button>
-        </div>
-      </div>
 
-        <div class="add-comment-form">
-            <textarea 
-                placeholder="Add a comment..." 
-                [(ngModel)]="card.newComment" 
-                class="comment-input"
-                (keydown.enter)="$event.preventDefault(); onAddComment()">
+        <div class="card-tags">
+            <span class="tag">backend</span>
+        </div>
+        <h4>{{ card.title }}</h4>
+        <p>{{ card.description }}</p>
+
+        <div class="card-footer">
+            <div class="card-meta">
+                <span class="meta-item comment-toggle" (click)="onToggleComments()" [class.active]="isCommentsOpen">
+                    <i class="far fa-comment"></i> {{ card.comments?.length || 0 }}
+                </span>
+
+                <button class="meta-item" (click)="delete.emit(card.id)"> 
+                          <i class="fas fa-trash">  </i>
+                </button>
+            </div>
+            <div class="assignee" *ngIf="card.members && card.members.length > 0">
+                <div class="member-avatars">
+                    <div *ngFor="let member of card.members | slice:0:3" class="member-avatar">
+                        <img [src]="getUserAvatar(getMemberUser(member))" [alt]="getMemberUser(member).username"
+                            [title]="getMemberUser(member).username">
+                    </div>
+                    <div class="member-count" *ngIf="card.members.length > 3">
+                        +{{ card.members.length - 3 }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="comments-section" *ngIf="isCommentsOpen">
+            <div class="comments-header">
+                <i class="far fa-comment"></i>
+                <span>{{ card.comments?.length || 0 }} comment(s)</span>
+                <button class="btn-close-comments" (click)="onToggleComments()" title="Close comments">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="comments-list" *ngIf="card.comments && card.comments.length > 0">
+                <div *ngFor="let comment of card.comments" class="comment">
+
+                    <div class="comment-header">
+                        <img [src]="getUserAvatar(comment.user)" class="comment-avatar" alt="User">
+
+                        <span class="comment-author">{{ comment.user.username }}</span>
+                        <span class="comment-date">{{ formatDate(comment.createdAt) }}</span>
+
+                    </div>
+                    <p class="comment-content">{{ comment.content }}</p>
+                    <button *ngIf="canModifyComment(comment)" class="btn-icon btn-delete"
+                        (click)="onDeleteComment(comment.id)" title="Delete comment">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="add-comment-form">
+                <textarea placeholder="Add a comment..." [(ngModel)]="card.newComment" class="comment-input"
+                    (keydown.enter)="$event.preventDefault(); onAddComment()">
             </textarea>
-            <button 
-                class="btn-add-comment" 
-                (click)="onAddComment()"
-                [disabled]="!card.newComment?.trim()">
-                <i class="fas fa-paper-plane"></i>
-            </button>
+                <button class="btn-add-comment" (click)="onAddComment()" [disabled]="!card.newComment?.trim()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
         </div>
     </div>
-  </div>
 </div>

@@ -17,6 +17,8 @@ import { UserDTO } from '../../../core/models/user/user-dto.model';
 export class CardComponent {
   @Input() card!: ExtendedCardDTO & { comments: CommentDTO[] };
   @Input() listId!: number;
+@Input() color!: string;
+
   @Input() currentUser!: UserDTO;
   @Input() isCommentsOpen = false;
   
@@ -34,8 +36,6 @@ export class CardComponent {
   }
 
   onAddComment() {
-      console.log('CardComponent: Emitting addComment event', this.card, this.listId);
-
     this.addComment.emit({card: this.card, listId: this.listId});
   }
 
@@ -46,11 +46,18 @@ export class CardComponent {
       listId: this.listId  
     });
   }
+  
+  getMemberUser(member: any): UserDTO {
+  return member.user || member;
+ }
 
   getUserAvatar(user: UserDTO): string {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=random&size=32`;
   }
+  getOwnerAvatar(user: UserDTO): string {
 
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=random&size=32`;
+  }
   formatDate(dateString: string): string {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('en-US', {

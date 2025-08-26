@@ -261,7 +261,6 @@
     flex: 0 0 280px;
   }
 }
-/* Modal styles */
 .modal-backdrop {
     position: fixed;
     top: 0;
@@ -639,7 +638,6 @@
     cursor: not-allowed;
 }
 
-/* Animation for modal */
 .modal {
     animation: modalFadeIn 0.3s ease;
 }
@@ -654,7 +652,6 @@
         transform: translateY(0) scale(1);
     }
 }
-/* Board Members Display Styles */
 .header-main {
   display: flex;
   align-items: center;
@@ -724,7 +721,6 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
   .header-main {
     flex-direction: column;
@@ -764,4 +760,70 @@
 .custom-tooltip.show {
   opacity: 1;
   transform: translateY(0);
+}
+.board {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 0 16px 20px;
+  align-items: flex-start;
+  
+  .lists-container {
+    display: flex;
+    gap: 16px;
+  }
+}
+
+.draggable-list {
+  cursor: grab;
+  transition: transform 0.2s ease;
+  
+  &:active {
+    cursor: grabbing;
+  }
+  
+  &.cdk-drag-preview {
+    opacity: 0.8;
+    transform: rotate(5deg);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    
+    .list {
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+  }
+  
+  &.cdk-drag-placeholder {
+    opacity: 0.3;
+    background: #f1f5f9;
+    border-radius: 12px;
+    width: 320px;
+    
+    .list {
+      visibility: hidden;
+    }
+  }
+  
+  &.cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+.lists-container.cdk-drop-list-dragging .draggable-list:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.list {
+  transition: box-shadow 0.2s ease;
+  
+  .cdk-drag-dragging & {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.add-new-list {
+  flex: 0 0 320px;
+  
+  .add-list-btn, .add-list-form {
+    cursor: default; 
+  }
 }
