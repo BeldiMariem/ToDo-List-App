@@ -8,14 +8,17 @@ export class CardService {
   private http = inject(HttpClient);
 
   getCards(listId: number) {
-    return this.http.get<CardDTO[]>(`${environment.apiUrl}/lists/${listId}/cards`);
+    return this.http.get<CardDTO[]>(`${environment.apiUrl}/cards/getCardsByList/${listId}`);
   }
 
   createCard(payload: Partial<CardDTO>) {
-    return this.http.post<CardDTO>(`${environment.apiUrl}/cards`, payload);
+    return this.http.post<CardDTO>(`${environment.apiUrl}/cards/createCard`, payload);
+  }
+  updateCard(cardId: number,payload: Partial<CardDTO>) {
+    return this.http.put<CardDTO>(`${environment.apiUrl}/cards/updateCard/${cardId}`, payload);
   }
 
-  deleteCard(id: number) {
-    return this.http.delete(`${environment.apiUrl}/cards/${id}`);
+  deleteCard(cardId: number) {
+    return this.http.delete(`${environment.apiUrl}/cards/deleteCard/${cardId}`);
   }
 }

@@ -1,0 +1,129 @@
+<div class="register-page">
+  <div class="register-left">
+    <h1>Create an account</h1>
+    <p class="subtitle">Join us and start your journey</p>
+
+    @if (showSuccessMessage) {
+      <div class="success-message">
+        <i class="fas fa-check-circle"></i>
+        Registration successful! Redirecting to login...
+      </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <div class="form-field">
+        <label for="username">Username</label>
+        <input
+          id="username"
+          type="text"
+          formControlName="username"
+          placeholder="Enter your username"
+          [class.error]="usernameInvalid"
+          (blur)="markAsTouched('username')"
+        />
+
+        @if (usernameInvalid) {
+          <div class="field-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            @if (form.get('username')?.errors?.['required']) {
+              <span>Username is required</span>
+            }
+            @if (form.get('username')?.errors?.['minlength']) {
+              <span>Must be at least 3 characters</span>
+            }
+            @if (form.get('username')?.errors?.['pattern']) {
+              <span>Only letters, numbers, and underscores allowed</span>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="Enter your email"
+          [class.error]="emailInvalid"
+          (blur)="markAsTouched('email')"
+        />
+
+        @if (emailInvalid) {
+          <div class="field-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            @if (form.get('email')?.errors?.['required']) {
+              <span>Email is required</span>
+            }
+            @if (form.get('email')?.errors?.['email']) {
+              <span>Please enter a valid email address</span>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="Enter your password"
+          [class.error]="passwordInvalid"
+          (blur)="markAsTouched('password')"
+        />
+
+        @if (passwordInvalid) {
+          <div class="field-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            @if (form.get('password')?.errors?.['required']) {
+              <span>Password is required</span>
+            }
+            @if (form.get('password')?.errors?.['minlength']) {
+              <span>Must be at least 6 characters</span>
+            }
+            @if (form.get('password')?.errors?.['pattern']) {
+              <span>Must include uppercase, lowercase, and number</span>
+            }
+          </div>
+        }
+
+        @if (form.get('password')?.valid) {
+          <div class="password-strength">
+            <div
+              class="strength-bar"
+              [class.weak]="passwordStrength === 'weak'" 
+              [class.medium]="passwordStrength === 'medium'" 
+              [class.strong]="passwordStrength === 'strong'">
+            </div>
+            <span class="strength-text">{{ passwordStrength | titlecase }} password</span>
+          </div>
+        }
+      </div>
+
+      <button type="submit" class="register-button" [disabled]="auth.loading() || form.invalid">
+        {{ auth.loading() ? 'Creating Account…' : 'Create Account' }}
+        @if (auth.loading()) {
+          <span class="loading-spinner"></span>
+        }
+      </button>
+
+      <div class="signup-prompt">
+        Already have an account?
+        <a routerLink="/login">Login</a>
+      </div>
+
+      @if (auth.error()) {
+        <p class="error">{{ auth.error() }}</p>
+      }
+    </form>
+  </div>
+
+  <div class="register-right">
+    <img
+      src="https://media.istockphoto.com/id/1219250750/vector/online-registration-and-sign-up-concept-people-signing-up-or-login-to-online-account-with.jpg?s=612x612&w=0&k=20&c=1IEI_a33YhMHcZorJNzA5ECND__5WiILMHErwlWsu6E="
+      alt="Register Illustration"
+      class="illustration"
+    />
+  </div>
+</div>

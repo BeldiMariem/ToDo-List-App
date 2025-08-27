@@ -53,7 +53,14 @@ public class ListServiceImpl implements ListService {
         listRepository.delete(list);
     }
 
-
+    @Override
+    @Transactional
+    public ListDTO updateList(ListDTO listDTO) {
+        ListEntity list = findListById(listDTO.getId());
+        list.setName(listDTO.getName());
+        list.setColor(listDTO.getColor());
+        return listMapper.toDto(listRepository.save(list));
+    }
     private Board findBoardById(Long boardId) {
         return boardRepository.findById(boardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Board", "id", boardId));
@@ -63,4 +70,7 @@ public class ListServiceImpl implements ListService {
         return listRepository.findById(listId)
                 .orElseThrow(() -> new ResourceNotFoundException("List", "id", listId));
     }
+    
+  
+
 }
