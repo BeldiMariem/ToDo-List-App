@@ -86,7 +86,7 @@ export class AuthService {
     this._state.update(s => ({ ...s, loading: true, error: null }));
     this.http.post<UserDTO>(`${environment.apiUrl}/auth/register`, payload)
       .subscribe({
-        next: (user) => {
+        next: () => {
           this._state.update(s => ({ ...s, loading: false }));
           this.router.navigateByUrl('/login');
         },

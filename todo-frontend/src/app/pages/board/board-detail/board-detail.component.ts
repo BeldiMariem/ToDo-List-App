@@ -251,7 +251,7 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
     };
 
     this.boardService.updateBoard(payload).subscribe({
-      next: (updatedBoard) => {
+      next: () => {
         this.loadBoardData();
 
         this.isAddingMember = false;
@@ -480,7 +480,7 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          alert('Failed to update list. Please try again.');
+          console.error('Failed to update list. Please try again.', error);
         }
       });
   }

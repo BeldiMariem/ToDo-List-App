@@ -3,10 +3,12 @@
     <h1>Create an account</h1>
     <p class="subtitle">Join us and start your journey</p>
 
-    <div *ngIf="showSuccessMessage" class="success-message">
-      <i class="fas fa-check-circle"></i>
-      Registration successful! Redirecting to login...
-    </div>
+    @if (showSuccessMessage) {
+      <div class="success-message">
+        <i class="fas fa-check-circle"></i>
+        Registration successful! Redirecting to login...
+      </div>
+    }
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
       <div class="form-field">
@@ -19,12 +21,21 @@
           [class.error]="usernameInvalid"
           (blur)="markAsTouched('username')"
         />
-        <div *ngIf="usernameInvalid" class="field-error">
-          <i class="fas fa-exclamation-triangle"></i>
-          <span *ngIf="form.get('username')?.errors?.['required']">Username is required</span>
-          <span *ngIf="form.get('username')?.errors?.['minlength']">Must be at least 3 characters</span>
-          <span *ngIf="form.get('username')?.errors?.['pattern']">Only letters, numbers, and underscores allowed</span>
-        </div>
+
+        @if (usernameInvalid) {
+          <div class="field-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            @if (form.get('username')?.errors?.['required']) {
+              <span>Username is required</span>
+            }
+            @if (form.get('username')?.errors?.['minlength']) {
+              <span>Must be at least 3 characters</span>
+            }
+            @if (form.get('username')?.errors?.['pattern']) {
+              <span>Only letters, numbers, and underscores allowed</span>
+            }
+          </div>
+        }
       </div>
 
       <div class="form-field">
@@ -37,11 +48,18 @@
           [class.error]="emailInvalid"
           (blur)="markAsTouched('email')"
         />
-        <div *ngIf="emailInvalid" class="field-error">
-          <i class="fas fa-exclamation-triangle"></i>
-          <span *ngIf="form.get('email')?.errors?.['required']">Email is required</span>
-          <span *ngIf="form.get('email')?.errors?.['email']">Please enter a valid email address</span>
-        </div>
+
+        @if (emailInvalid) {
+          <div class="field-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            @if (form.get('email')?.errors?.['required']) {
+              <span>Email is required</span>
+            }
+            @if (form.get('email')?.errors?.['email']) {
+              <span>Please enter a valid email address</span>
+            }
+          </div>
+        }
       </div>
 
       <div class="form-field">
@@ -54,23 +72,40 @@
           [class.error]="passwordInvalid"
           (blur)="markAsTouched('password')"
         />
-        <div *ngIf="passwordInvalid" class="field-error">
-          <i class="fas fa-exclamation-triangle"></i>
-          <span *ngIf="form.get('password')?.errors?.['required']">Password is required</span>
-          <span *ngIf="form.get('password')?.errors?.['minlength']">Must be at least 6 characters</span>
-          <span *ngIf="form.get('password')?.errors?.['pattern']">Must include uppercase, lowercase, and number</span>
-        </div>
-        <div *ngIf="form.get('password')?.valid" class="password-strength">
-          <div class="strength-bar" [class.weak]="passwordStrength === 'weak'" 
-               [class.medium]="passwordStrength === 'medium'" 
-               [class.strong]="passwordStrength === 'strong'"></div>
-          <span class="strength-text">{{ passwordStrength | titlecase }} password</span>
-        </div>
+
+        @if (passwordInvalid) {
+          <div class="field-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            @if (form.get('password')?.errors?.['required']) {
+              <span>Password is required</span>
+            }
+            @if (form.get('password')?.errors?.['minlength']) {
+              <span>Must be at least 6 characters</span>
+            }
+            @if (form.get('password')?.errors?.['pattern']) {
+              <span>Must include uppercase, lowercase, and number</span>
+            }
+          </div>
+        }
+
+        @if (form.get('password')?.valid) {
+          <div class="password-strength">
+            <div
+              class="strength-bar"
+              [class.weak]="passwordStrength === 'weak'" 
+              [class.medium]="passwordStrength === 'medium'" 
+              [class.strong]="passwordStrength === 'strong'">
+            </div>
+            <span class="strength-text">{{ passwordStrength | titlecase }} password</span>
+          </div>
+        }
       </div>
 
       <button type="submit" class="register-button" [disabled]="auth.loading() || form.invalid">
         {{ auth.loading() ? 'Creating Account…' : 'Create Account' }}
-        <span *ngIf="auth.loading()" class="loading-spinner"></span>
+        @if (auth.loading()) {
+          <span class="loading-spinner"></span>
+        }
       </button>
 
       <div class="signup-prompt">
@@ -78,7 +113,9 @@
         <a routerLink="/login">Login</a>
       </div>
 
-      <p *ngIf="auth.error()" class="error">{{ auth.error() }}</p>
+      @if (auth.error()) {
+        <p class="error">{{ auth.error() }}</p>
+      }
     </form>
   </div>
 

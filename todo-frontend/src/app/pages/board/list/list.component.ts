@@ -15,7 +15,7 @@ export class ListComponent {
   @Input() list!: any;
   @Input() activeListId: number | null = null;
   @Input() currentUser!: any;
-  @Input() openCommentCards: Set<number> = new Set();
+  @Input() openCommentCards = new Set<number>();
 
   @Output() delete = new EventEmitter<number>();
   @Output() showAddCardForm = new EventEmitter<number>();

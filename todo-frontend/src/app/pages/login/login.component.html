@@ -3,10 +3,12 @@
     <h1>Welcome back</h1>
     <p class="subtitle">Please enter your details</p>
 
-    <div *ngIf="errorMessage" class="error-message">
-      <i class="fas fa-exclamation-circle"></i>
-      {{ errorMessage }}
-    </div>
+    @if (errorMessage) {
+      <div class="error-message">
+        <i class="fas fa-exclamation-circle"></i>
+        {{ errorMessage }}
+      </div>
+    }
 
     <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
       <div class="form-field">
@@ -21,10 +23,12 @@
           [class.error]="showUsernameError"
           (input)="clearError()"
         />
-        <div *ngIf="showUsernameError" class="field-error">
-          <i class="fas fa-exclamation-triangle"></i>
-          Username is required
-        </div>
+        @if (showUsernameError) {
+          <div class="field-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            Username is required
+          </div>
+        }
       </div>
 
       <div class="form-field">
@@ -39,15 +43,20 @@
           [class.error]="showPasswordError"
           (input)="clearError()"
         />
-        <div *ngIf="showPasswordError" class="field-error">
-          <i class="fas fa-exclamation-triangle"></i>
-          Password is required
-        </div>
+        @if (showPasswordError) {
+          <div class="field-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            Password is required
+          </div>
+        }
       </div>
 
       <button type="submit" class="login-button" [disabled]="isLoading">
-        <span *ngIf="!isLoading">Sign in</span>
-        <span *ngIf="isLoading">Signing in...</span>
+        @if (!isLoading) {
+          <span>Sign in</span>
+        } @else {
+          <span>Signing in...</span>
+        }
       </button>
 
       <div class="signup-prompt">

@@ -3,25 +3,33 @@
         <div class="header-main">
             <h1>{{ board?.name || 'Project Dashboard' }}</h1>
 
-            <div class="board-members" *ngIf="boardMembersWithDetails && boardMembersWithDetails.length > 0">
-                <div class="members-label">Team:</div>
-                <div class="members-list">
-                    <div *ngFor="let member of boardMembersWithDetails | slice:0:4" class="member-container">
-                        <div class="member-avatar" (mouseenter)="showTooltip($event, member.email)"
-                            (mouseleave)="hideTooltip()">
-                            {{ getUserInitials(member.email) }}
-                        </div>
+            @if (boardMembersWithDetails && boardMembersWithDetails.length > 0) {
+                <div class="board-members">
+                    <div class="members-label">Team:</div>
+                    <div class="members-list">
+                        @for (member of boardMembersWithDetails.slice(0,4); track member.id) {
+                            <div class="member-container">
+                                <div class="member-avatar"
+                                    (mouseenter)="showTooltip($event, member.email)"
+                                    (mouseleave)="hideTooltip()">
+                                    {{ getUserInitials(member.email) }}
+                                </div>
+                            </div>
+                        }
+                        @if (boardMembersWithDetails.length > 4) {
+                            <div class="member-count">
+                                +{{ boardMembersWithDetails.length - 4 }}
+                            </div>
+                        }
                     </div>
-                    <div class="member-count" *ngIf="boardMembersWithDetails.length > 4">
-                        +{{ boardMembersWithDetails.length - 4 }}
-                    </div>
-                </div>
 
-                <div class="custom-tooltip" [class.show]="isTooltipVisible" [style.left]="tooltipPosition.x + 'px'"
-                    [style.top]="tooltipPosition.y + 'px'">
-                    {{ tooltipText }}
+                    <div class="custom-tooltip" [class.show]="isTooltipVisible"
+                        [style.left]="tooltipPosition.x + 'px'"
+                        [style.top]="tooltipPosition.y + 'px'">
+                        {{ tooltipText }}
+                    </div>
                 </div>
-            </div>
+            }
         </div>
 
         <div class="header-actions">
@@ -35,99 +43,117 @@
         </div>
     </header>
 
-
-
-    <div class="modal-backdrop" *ngIf="showAddMemberModal" (click)="onBackdropClick($event)">
-        <div class="modal" (click)="$event.stopPropagation()">
-            <div class="modal-header">
-                <h3>Add Team Members</h3>
-                <button class="close-btn" (click)="closeAddMemberModal()">×</button>
-            </div>
-
-            <div class="modal-body">
-                <div class="search-section">
-                    <div class="search-input-container">
-                        <i class="fas fa-search"></i>
-                        <input id="userSearch" type="text" [(ngModel)]="userSearchQuery" (input)="filterUsers()"
-                            placeholder="Search by email or name..." (click)="$event.stopPropagation()" />
-                    </div>
+    @if (showAddMemberModal) {
+        <div class="modal-backdrop" (click)="onBackdropClick($event)">
+            <div class="modal" (click)="$event.stopPropagation()">
+                <div class="modal-header">
+                    <h3>Add Team Members</h3>
+                    <button class="close-btn" (click)="closeAddMemberModal()">×</button>
                 </div>
 
-                <div class="selection-container">
-                    <div class="selected-users-preview" *ngIf="selectedUsers.length > 0">
-                        <div class="selected-count">{{ selectedUsers.length }} selected</div>
-                        <div class="selected-users-chips">
-                            <div *ngFor="let user of selectedUsers" class="user-chip">
-                                <div class="chip-avatar">
-                                    {{ getUserInitials(user.email!) }}
-                                </div>
-                                <span class="chip-email">{{ user.email }}</span>
-                                <button class="chip-remove"
-                                    (click)="removeUserFromSelection(user); $event.stopPropagation()">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
+                <div class="modal-body">
+                    <div class="search-section">
+                        <div class="search-input-container">
+                            <i class="fas fa-search"></i>
+                            <input id="userSearch" type="text"
+                                [(ngModel)]="userSearchQuery"
+                                (input)="filterUsers()"
+                                placeholder="Search by email or name..."
+                                (click)="$event.stopPropagation()" />
                         </div>
                     </div>
 
-                    <div class="users-list-container">
-                        <div class="users-list-header">
-                            <span>Select Users</span>
-                            <span class="selected-count" *ngIf="selectedUsers.length > 0">
-                                {{ selectedUsers.length }} selected
-                            </span>
-                        </div>
+                    <div class="selection-container">
+                        @if (selectedUsers.length > 0) {
+                            <div class="selected-users-preview">
+                                <div class="selected-count">{{ selectedUsers.length }} selected</div>
+                                <div class="selected-users-chips">
+                                    @for (user of selectedUsers; track user.id) {
+                                        <div class="user-chip">
+                                            <div class="chip-avatar">
+                                                {{ getUserInitials(user.email!) }}
+                                            </div>
+                                            <span class="chip-email">{{ user.email }}</span>
+                                            <button class="chip-remove"
+                                                (click)="removeUserFromSelection(user); $event.stopPropagation()">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
 
-                        <div class="users-list">
-                            <div *ngFor="let user of filteredUsers" class="user-item"
-                                [class.selected]="isUserSelected(user.id)"
-                                (click)="toggleUserSelection(user); $event.stopPropagation()">
-                                <div class="user-select-indicator">
-                                    <div class="custom-checkbox" [class.checked]="isUserSelected(user.id)">
-                                        <i class="fas fa-check" *ngIf="isUserSelected(user.id)"></i>
+                        <div class="users-list-container">
+                            <div class="users-list-header">
+                                <span>Select Users</span>
+                                @if (selectedUsers.length > 0) {
+                                    <span class="selected-count">
+                                        {{ selectedUsers.length }} selected
+                                    </span>
+                                }
+                            </div>
+
+                            <div class="users-list">
+                                @for (user of filteredUsers; track user.id) {
+                                    <div class="user-item"
+                                        [class.selected]="isUserSelected(user.id)"
+                                        (click)="toggleUserSelection(user); $event.stopPropagation()">
+
+                                        <div class="user-select-indicator">
+                                            <div class="custom-checkbox" [class.checked]="isUserSelected(user.id)">
+                                                @if (isUserSelected(user.id)) {
+                                                    <i class="fas fa-check"></i>
+                                                }
+                                            </div>
+                                        </div>
+
+                                        <div class="user-avatar">
+                                            {{ getUserInitials(user.email!) }}
+                                        </div>
+
+                                        <div class="user-details">
+                                            <div class="user-email">{{ user.email }}</div>
+                                            <div class="user-name">{{ user.username || 'User' }}</div>
+                                        </div>
                                     </div>
-                                </div>
-
-                                <div class="user-avatar">
-                                    {{ getUserInitials(user.email!) }}
-                                </div>
-
-                                <div class="user-details">
-                                    <div class="user-email">{{ user.email }}</div>
-                                    <div class="user-name">{{ user.username || 'User' }}</div>
-                                </div>
+                                }
                             </div>
-                        </div>
 
-                        <div *ngIf="filteredUsers.length === 0" class="no-users-message">
-                            <i class="fas fa-user-slash"></i>
-                            <p>No users found</p>
-                            <p class="sub-text" *ngIf="userSearchQuery">for "{{ userSearchQuery }}"</p>
+                            @if (filteredUsers.length === 0) {
+                                <div class="no-users-message">
+                                    <i class="fas fa-user-slash"></i>
+                                    <p>No users found</p>
+                                    @if (userSearchQuery) {
+                                        <p class="sub-text">for "{{ userSearchQuery }}"</p>
+                                    }
+                                </div>
+                            }
                         </div>
                     </div>
+
+                    @if (selectedUsers.length > 0) {
+                        <div class="role-selection">
+                            <label for="userRole">Assign Role</label>
+                            <select id="userRole" [(ngModel)]="selectedRole" class="role-select"
+                                (click)="$event.stopPropagation()">
+                                <option value="MEMBER">Member</option>
+                                <option value="ADMIN">Admin</option>
+                            </select>
+                        </div>
+                    }
                 </div>
 
-                <div class="role-selection" *ngIf="selectedUsers.length > 0">
-                    <label for="userRole">Assign Role</label>
-                    <select id="userRole" [(ngModel)]="selectedRole" class="role-select"
-                        (click)="$event.stopPropagation()">
-                        <option value="MEMBER">Member</option>
-                        <option value="ADMIN">Admin</option>
-                    </select>
+                <div class="modal-footer">
+                    <button class="btn-secondary" (click)="closeAddMemberModal(); $event.stopPropagation()">Cancel</button>
+                    <button class="btn-primary" (click)="addMembersToBoard(); $event.stopPropagation()"
+                        [disabled]="selectedUsers.length === 0 || isAddingMember">
+                        {{ isAddingMember ? 'Adding...' : ('Add ' + selectedUsers.length + ' Member' + (selectedUsers.length !== 1 ? 's' : '')) }}
+                    </button>
                 </div>
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn-secondary" (click)="closeAddMemberModal(); $event.stopPropagation()">Cancel</button>
-                <button class="btn-primary" (click)="addMembersToBoard(); $event.stopPropagation()"
-                    [disabled]="selectedUsers.length === 0 || isAddingMember">
-                    {{ isAddingMember ? 'Adding...' : ('Add ' + selectedUsers.length + ' Member' + (selectedUsers.length
-                    !== 1 ? 's' : '')) }}
-                </button>
             </div>
         </div>
-    </div>
-
+    }
 
     <div class="stats-bar">
         <div class="stat-item stat-item-total">
@@ -135,40 +161,51 @@
             <span class="stat-label">Total Tasks</span>
         </div>
 
-        <div class="stat-item" *ngFor="let list of lists" [style.borderLeftColor]="list.color">
-            <span class="stat-number">{{ list.cards.length }}</span>
-            <span class="stat-label">{{ list.name }}</span>
-        </div>
+        @for (list of lists; track list.id) {
+            <div class="stat-item" [style.borderLeftColor]="list.color">
+                <span class="stat-number">{{ list.cards.length }}</span>
+                <span class="stat-label">{{ list.name }}</span>
+            </div>
+        }
     </div>
+
     <div cdkDropListGroup class="board">
         <div cdkDropList [cdkDropListData]="lists" (cdkDropListDropped)="onListDrop($event)" class="lists-container">
 
-            <div *ngFor="let list of lists; let i = index" cdkDrag class="draggable-list">
-
-                <app-list [list]="list" [activeListId]="activeListId" [currentUser]="currentUser"
-                    [openCommentCards]="openCommentCards" (delete)="onDeleteList($event)"
-                    (showAddCardForm)="onShowAddCardForm($event)" (addCard)="onAddCard($event)"
-                    (cancelAddCard)="onCancelAddCard()" (drop)="onDrop($event, list.id)"
-                    (deleteCard)="onDeleteCard($event.cardId, $event.listId)"
-                    (toggleCardComments)="onToggleCardComments($event)" (addComment)="onAddComment($event)"
-                    (deleteCardComment)="onDeleteCardComment($event)" (updateList)="onUpdateList($event)">
-                </app-list>
-            </div>
+            @for (list of lists; track list.id; let i = $index) {
+                <div cdkDrag class="draggable-list">
+                    <app-list [list]="list" [activeListId]="activeListId" [currentUser]="currentUser"
+                        [openCommentCards]="openCommentCards"
+                        (delete)="onDeleteList($event)"
+                        (showAddCardForm)="onShowAddCardForm($event)"
+                        (addCard)="onAddCard($event)"
+                        (cancelAddCard)="onCancelAddCard()"
+                        (drop)="onDrop($event, list.id)"
+                        (deleteCard)="onDeleteCard($event.cardId, $event.listId)"
+                        (toggleCardComments)="onToggleCardComments($event)"
+                        (addComment)="onAddComment($event)"
+                        (deleteCardComment)="onDeleteCardComment($event)"
+                        (updateList)="onUpdateList($event)">
+                    </app-list>
+                </div>
+            }
         </div>
 
         <div class="add-new-list">
-            <div *ngIf="!showAddListForm" class="add-list-btn" (click)="showAddListForm = true">
-                <i class="fas fa-plus"></i> Add List
-            </div>
-
-            <div *ngIf="showAddListForm" class="add-list-form">
-                <input type="text" placeholder="List name" [(ngModel)]="newListName" class="form-input">
-                <input type="color" [(ngModel)]="newListColor" class="form-color">
-                <div class="form-actions">
-                    <button (click)="addList()" class="btn-add">Add List</button>
-                    <button (click)="cancelAddList()" class="btn-cancel">Cancel</button>
+            @if (!showAddListForm) {
+                <div class="add-list-btn" (click)="showAddListForm = true">
+                    <i class="fas fa-plus"></i> Add List
                 </div>
-            </div>
+            } @else {
+                <div class="add-list-form">
+                    <input type="text" placeholder="List name" [(ngModel)]="newListName" class="form-input">
+                    <input type="color" [(ngModel)]="newListColor" class="form-color">
+                    <div class="form-actions">
+                        <button (click)="addList()" class="btn-add">Add List</button>
+                        <button (click)="cancelAddList()" class="btn-cancel">Cancel</button>
+                    </div>
+                </div>
+            }
         </div>
     </div>
 </div>

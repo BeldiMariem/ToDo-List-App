@@ -1,8 +1,7 @@
-import { Component, Output, EventEmitter, inject, Input } from '@angular/core';
+import { Component, Output, EventEmitter, inject, Input, OnInit } from '@angular/core';
 import { UserDTO } from '../../core/models/user/user-dto.model';
 import { AuthService } from '../../core/services/auth.service';
-import { NavigationEnd, Router, RouterLink } from '@angular/router';
-import { filter } from 'rxjs';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
@@ -10,7 +9,7 @@ import { filter } from 'rxjs';
   styleUrls: ['./sidebar.component.scss'],
   imports: [RouterLink]
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
   @Output() menuItemSelected = new EventEmitter<string>();
   @Output() toggleSidebar = new EventEmitter<void>();
   @Input() isCollapsed = false;
