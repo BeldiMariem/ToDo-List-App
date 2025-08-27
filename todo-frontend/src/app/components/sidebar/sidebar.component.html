@@ -1,0 +1,55 @@
+<div class="sidebar" [class.collapsed]="isCollapsed">
+  <div class="sidebar-header">
+    <div class="logo">
+      <span>Todo UI</span>
+    </div>
+    <button class="toggle-btn" (click)="onToggleSidebar()">
+      <i class="fas" [class.fa-chevron-left]="!isCollapsed" [class.fa-chevron-right]="isCollapsed"></i>
+    </button>
+  </div>
+
+  <div class="user-profile" *ngIf="isAuthenticated()">
+    <div class="avatar">
+      <img src="https://static.vecteezy.com/system/resources/previews/022/450/297/non_2x/3d-minimal-purple-user-profile-avatar-icon-in-circle-white-frame-design-vector.jpg" alt="User Avatar">
+    </div>
+    <div class="user-info">
+      <h3>{{ currentUser().username || userEmail() }}</h3>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <ul class="nav-menu">
+      <li [class.active]="dashboardActive" >
+        <i class="fas fa-grid"></i>
+        <span>Dashboard</span>
+      </li>
+      
+      <li [class.active]="boardsActive" >
+        <i class="fas fa-list-check"></i>
+        <span routerLink="/boards">My Boards</span>
+      </li>
+       <li [class.active]="teamActive">
+        <i class="fas fa-cog"></i>
+        <span routerLink="/login">Profile Settings</span>
+      </li>
+      
+      <li [class.active]="tasksActive">
+        <i class="fas fa-check-square"></i>
+        <span>Tasks</span>
+      </li>
+      
+      <li [class.active]="calendarActive">
+        <i class="fas fa-calendar"></i>
+        <span>Calendar</span>
+      </li>
+      
+    </ul>
+
+    <ul class="nav-menu bottom-menu">
+      <li [class.active]="logoutActive" >
+        <i class="fas fa-log-out"></i>
+        <span routerLink="/logout">Logout</span>
+      </li>
+    </ul>
+  </nav>
+</div>

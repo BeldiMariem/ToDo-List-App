@@ -1,0 +1,70 @@
+<div class="login-page">
+  <div class="login-left">
+    <h1>Welcome back</h1>
+    <p class="subtitle">Please enter your details</p>
+
+    @if (errorMessage) {
+    <div class="error-message">
+      <i class="fas fa-exclamation-circle"></i>
+      {{ errorMessage }}
+    </div>
+    }
+
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div class="form-field">
+        <label for="username">Username</label>
+        <input id="username" type="text" [(ngModel)]="username" name="username" placeholder="Enter your username"
+          required [class.error]="showUsernameError" (input)="clearError()" />
+        @if (showUsernameError) {
+        <div class="field-error">
+          <i class="fas fa-exclamation-triangle"></i>
+          Username is required
+        </div>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="password">Password</label>
+        <input id="password" type="password" [(ngModel)]="password" name="password" placeholder="Enter your password"
+          required [class.error]="showPasswordError" (input)="clearError()" />
+        @if (showPasswordError) {
+        <div class="field-error">
+          <i class="fas fa-exclamation-triangle"></i>
+          Password is required
+        </div>
+        }
+      </div>
+
+      <button type="submit" class="login-button" [disabled]="isLoading">
+        @if (!isLoading) {
+        <span>Sign in</span>
+        }
+        @if (isLoading) {
+        <span>Signing in...</span>
+        }
+      </button>
+
+      <div class="oauth-separator">
+        <span>Or continue with</span>
+      </div>
+
+      <button type="button" class="google-login-button" (click)="signInWithGoogle()" [disabled]="isLoading">
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1200px-Google_%22G%22_logo.svg.png"
+          alt="Google logo" class="google-logo">
+        Sign in with Google
+      </button>
+      <br>
+      <div class="signup-prompt">
+        Don't have an account?
+        <a routerLink="/register">Sign up</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="login-right">
+    <img
+      src="https://media.istockphoto.com/id/1219250750/vector/online-registration-and-sign-up-concept-people-signing-up-or-login-to-online-account-with.jpg?s=612x612&w=0&k=20&c=1IEI_a33YhMHcZorJNzA5ECND__5WiILMHErwlWsu6E="
+      alt="Login Illustration" class="illustration" />
+  </div>
+</div>

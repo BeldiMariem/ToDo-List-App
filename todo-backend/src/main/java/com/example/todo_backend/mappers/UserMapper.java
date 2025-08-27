@@ -11,8 +11,7 @@ import com.example.todo_backend.entities.User;
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
     
-    @Mapping(target = "username", ignore = true)
-    @Mapping(target = "email", ignore = true)
+
     UserDTO toDTO(User user);
     
     @Mapping(target = "password", ignore = true)

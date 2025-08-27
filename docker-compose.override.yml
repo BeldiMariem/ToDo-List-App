@@ -20,6 +20,5 @@ services:
     volumes:
       - ./todo-frontend:/app
       - /app/node_modules
-    command: npm start
     ports:
         - "4201:4200"

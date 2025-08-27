@@ -8,7 +8,7 @@ export class CommentService {
   private http = inject(HttpClient);
 
   getComments(cardId: number) {
-    return this.http.get<CommentDTO[]>(`${environment.apiUrl}/cards/${cardId}/comments`);
+    return this.http.get<CommentDTO[]>(`${environment.apiUrl}/comments/getCommentsByCard/${cardId}`);
   }
 
   createComment(payload: Partial<CommentDTO>) {
@@ -16,6 +16,6 @@ export class CommentService {
   }
 
   deleteComment(id: number) {
-    return this.http.delete(`${environment.apiUrl}/comments/${id}`);
+    return this.http.delete(`${environment.apiUrl}/comments/deleteComment/${id}`);
   }
 }
