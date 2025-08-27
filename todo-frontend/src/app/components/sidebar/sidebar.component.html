@@ -8,12 +8,12 @@
     </button>
   </div>
 
-  <div class="user-profile" >
+  <div class="user-profile" *ngIf="isAuthenticated()">
     <div class="avatar">
       <img src="https://static.vecteezy.com/system/resources/previews/022/450/297/non_2x/3d-minimal-purple-user-profile-avatar-icon-in-circle-white-frame-design-vector.jpg" alt="User Avatar">
     </div>
     <div class="user-info">
-      <h3>{{ currentUser.email }}</h3>
+      <h3>{{ currentUser().username || userEmail() }}</h3>
     </div>
   </div>
 
@@ -48,7 +48,7 @@
     <ul class="nav-menu bottom-menu">
       <li [class.active]="logoutActive" >
         <i class="fas fa-log-out"></i>
-        <span routerLink="/login">Logout</span>
+        <span routerLink="/logout">Logout</span>
       </li>
     </ul>
   </nav>

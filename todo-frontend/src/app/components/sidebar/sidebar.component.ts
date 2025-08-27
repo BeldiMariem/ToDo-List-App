@@ -1,13 +1,14 @@
-import { Component, Output, EventEmitter, inject, Input, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, inject, Input, OnInit, computed, effect } from '@angular/core';
 import { UserDTO } from '../../core/models/user/user-dto.model';
 import { AuthService } from '../../core/services/auth.service';
 import { RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
-  imports: [RouterLink]
+  imports: [RouterLink, CommonModule]
 })
 export class SidebarComponent implements OnInit {
   @Output() menuItemSelected = new EventEmitter<string>();
@@ -16,7 +17,10 @@ export class SidebarComponent implements OnInit {
 
   private authService = inject(AuthService);
 
-  currentUser!: UserDTO;  
+  currentUser = computed(() => this.authService.getCurrentUser());
+  userEmail = computed(() => this.authService.getUserEmail());
+  userName = computed(() => this.authService.getUserName());
+  isAuthenticated = computed(() => this.authService.isAuthenticated());
 
   dashboardActive = true;
   boardsActive = false;
@@ -29,14 +33,9 @@ export class SidebarComponent implements OnInit {
   logoutActive = false;
 
   ngOnInit() {
-    const user = this.authService.getCurrentUser();
-    this.currentUser = user;  
   }
 
   onToggleSidebar() {
     this.toggleSidebar.emit();
   }
-
- 
-
 }

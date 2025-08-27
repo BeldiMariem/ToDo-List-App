@@ -97,11 +97,7 @@ export class AuthService {
       });
   }
 
-  logout() {
-    this._state.set({ token: null, loading: false, error: null });
-    this._currentUser.set(null);
-    this.router.navigateByUrl('/login');
-  }
+
 
   getCurrentUser(): UserDTO {
     const currentUser = this._currentUser();
@@ -140,6 +136,17 @@ export class AuthService {
     }
   }
 
+ 
+
+  handleOAuthToken(token: string) {
+    this._state.set({ token: token, loading: false, error: null });
+    this.fetchCurrentUserFromToken();
+  }
+  
+  handleAuthError(errorMessage: string) {
+    this._state.update(s => ({ ...s, loading: false, error: errorMessage }));
+  }
+
   private decodeJwt(token: string): any {
     try {
       const base64Url = token.split('.')[1];
@@ -155,8 +162,48 @@ export class AuthService {
     }
   }
 
-  isOwner(resourceOwnerId: number): boolean {
-    const user = this.getCurrentUser();
-    return user.id === resourceOwnerId;
+  getUserEmail(): string {
+    const token = this.token();
+    if (!token) return '';
+
+    try {
+      const payload = this.decodeJwt(token);
+      return payload.email || '';
+    } catch (e) {
+      console.error('Failed to get email from token', e);
+      return '';
+    }
   }
+
+  getUserName(): string {
+    const token = this.token();
+    if (!token) return '';
+
+    try {
+      const payload = this.decodeJwt(token);
+      return payload.username || '';
+    } catch (e) {
+      console.error('Failed to get email from token', e);
+      return '';
+    }
+  }
+  logout() {
+  this._state.set({ token: null, loading: false, error: null });
+  this._currentUser.set(null);
+  
+  localStorage.removeItem(this.STORAGE_KEY);
+  localStorage.removeItem(this.USER_STORAGE_KEY);
+  
+  localStorage.removeItem('any-other-auth-related-keys');
+  
+  this.router.navigateByUrl('/login');
+  }
+
+  clearAllAuthData() {
+    this.logout(); 
+      sessionStorage.clear(); 
+  }
+
+
+
 }

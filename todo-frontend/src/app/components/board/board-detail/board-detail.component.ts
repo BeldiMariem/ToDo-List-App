@@ -70,18 +70,36 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
   isTooltipVisible = false;
   tooltipText = '';
   tooltipPosition = { x: 0, y: 0 };
+  viewMode: 'grid' | 'list' = 'grid';
+
 
   ngOnInit() {
     this.boardId = Number(this.route.snapshot.paramMap.get('id'));
     this.loadCurrentUser();
     this.loadBoardData();
+
+    const savedViewMode = localStorage.getItem('boardViewMode');
+    if (savedViewMode === 'grid' || savedViewMode === 'list') {
+      this.viewMode = savedViewMode;
+    }
   }
 
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
   }
+  setViewMode(mode: 'grid' | 'list') {
+    this.viewMode = mode;
+    localStorage.setItem('boardViewMode', mode);
+  }
 
+  isGridView(): boolean {
+    return this.viewMode === 'grid';
+  }
+
+  isListView(): boolean {
+    return this.viewMode === 'list';
+  }
   @HostListener('document:keydown', ['$event'])
   onKeydownHandler(event: KeyboardEvent) {
     if (event.key === 'Escape' && this.showAddMemberModal) {

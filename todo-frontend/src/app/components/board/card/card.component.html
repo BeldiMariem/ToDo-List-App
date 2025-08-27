@@ -9,7 +9,6 @@
     </div>
     <h4>{{ card.title }}</h4>
     <p>{{ card.description }}</p>
-
     <div class="card-footer">
       <div class="card-meta">
         <span
@@ -17,7 +16,7 @@
           (click)="onToggleComments()"
           [class.active]="isCommentsOpen"
         >
-          <i class="far fa-comment"></i> {{ card.comments?.length || 0 }}
+          <i class="far fa-comment"></i> {{ card.comments!.length || 0 }}
         </span>
 
         <button class="meta-item" (click)="delete.emit(card.id)">
@@ -53,7 +52,7 @@
       <div class="comments-section">
         <div class="comments-header">
           <i class="far fa-comment"></i>
-          <span>{{ card.comments?.length || 0 }} comment(s)</span>
+          <span>{{ card.comments!.length || 0 }} comment(s)</span>
           <button
             class="btn-close-comments"
             (click)="onToggleComments()"
@@ -102,7 +101,7 @@
           <button
             class="btn-add-comment"
             (click)="onAddComment()"
-            [disabled]="!card.newComment?.trim()"
+            [disabled]="!card.newComment!.trim()"
           >
             <i class="fas fa-paper-plane"></i>
           </button>

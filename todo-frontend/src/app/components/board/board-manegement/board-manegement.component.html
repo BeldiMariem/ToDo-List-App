@@ -36,7 +36,7 @@
       
       @for (board of boards(); track board.id) {
         <div class="board-card" [style.background]="getBoardGradient($index)" 
-             [class.list-card]="viewMode() === 'list'">
+             [class.list-card]="viewMode() === 'list'" (click)="openBoard(board.id)">
           <div class="card-content">
             <h3>{{ board.name }}</h3>
             

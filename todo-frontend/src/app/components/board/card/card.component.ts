@@ -25,7 +25,7 @@ export class CardComponent {
   @Output() delete = new EventEmitter<number>();
   @Output() toggleComments = new EventEmitter<number>();
   @Output() addComment = new EventEmitter<{card: ExtendedCardDTO, listId: number}>();
-  @Output() deleteComment = new EventEmitter<{commentId: number, card: any, listId: number}>(); // FIXED: Added listId
+  @Output() deleteComment = new EventEmitter<{commentId: number, card: any, listId: number}>(); 
 
   onDelete() {
     this.delete.emit(this.card.id);

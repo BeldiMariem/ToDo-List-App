@@ -52,6 +52,13 @@ export class LoginComponent {
     }, 100);
   }
 
+   signInWithGoogle() {
+    this.isLoading = true;
+    this.clearErrors();
+    
+    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+  }
+
   private checkLoginStatus() {
     this.isLoading = false;
     const token = this.authService.token();
