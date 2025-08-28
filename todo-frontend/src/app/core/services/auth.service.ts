@@ -15,6 +15,9 @@ export class AuthService {
 
   private readonly STORAGE_KEY = 'auth_token';
   private readonly USER_STORAGE_KEY = 'current_user';
+    private _loginMethod = signal<'password' | 'google' | null>(null);
+  readonly loginMethod = computed(() => this._loginMethod());
+
 
   private _state = signal<AuthState>({ token: null, loading: false, error: null });
   private _currentUser = signal<UserDTO | null>(null);
@@ -66,12 +69,22 @@ export class AuthService {
     });
   }
 
+  updateCurrentUser(updatedUser: Partial<UserDTO>): void {
+    const currentUser = this._currentUser();
+    if (currentUser) {
+      const mergedUser = { ...currentUser, ...updatedUser };
+      this._currentUser.set(mergedUser);
+    }
+  }
+
   login(payload: LoginRequest) {
     this._state.update(s => ({ ...s, loading: true, error: null }));
+    
     this.http.post<JwtResponse>(`${environment.apiUrl}/auth/login`, payload)
       .subscribe({
         next: (res) => {
           this._state.set({ token: res.token, loading: false, error: null });
+          this._loginMethod.set('password');
           this.fetchCurrentUserFromToken();
           this.router.navigateByUrl('/boards');
         },
@@ -80,6 +93,11 @@ export class AuthService {
           this._state.set({ token: null, loading: false, error: msg });
         }
       });
+  }
+ handleOAuthToken(token: string) {
+    this._state.set({ token: token, loading: false, error: null });
+    this._loginMethod.set('google'); 
+    this.fetchCurrentUserFromToken();
   }
 
   register(payload: RegisterRequest) {
@@ -96,8 +114,6 @@ export class AuthService {
         }
       });
   }
-
-
 
   getCurrentUser(): UserDTO {
     const currentUser = this._currentUser();
@@ -127,8 +143,6 @@ export class AuthService {
           error: (err) => {
             const msg = err?.error?.message || 'Failed to fetch user';
             this._state.update(s => ({ ...s, error: msg }));
-
-
           }
         });
     } catch (e) {
@@ -136,12 +150,7 @@ export class AuthService {
     }
   }
 
- 
-
-  handleOAuthToken(token: string) {
-    this._state.set({ token: token, loading: false, error: null });
-    this.fetchCurrentUserFromToken();
-  }
+  
   
   handleAuthError(errorMessage: string) {
     this._state.update(s => ({ ...s, loading: false, error: errorMessage }));
@@ -187,23 +196,24 @@ export class AuthService {
       return '';
     }
   }
+
   logout() {
-  this._state.set({ token: null, loading: false, error: null });
-  this._currentUser.set(null);
-  
-  localStorage.removeItem(this.STORAGE_KEY);
-  localStorage.removeItem(this.USER_STORAGE_KEY);
-  
-  localStorage.removeItem('any-other-auth-related-keys');
-  
-  this.router.navigateByUrl('/login');
+    this._state.set({ token: null, loading: false, error: null });
+    this._currentUser.set(null);
+    this._loginMethod.set(null); 
+    
+    localStorage.removeItem(this.STORAGE_KEY);
+    localStorage.removeItem(this.USER_STORAGE_KEY);
+    
+    this.router.navigateByUrl('/login');
+  }
+
+  hasPasswordLogin(): boolean {
+    return this.loginMethod() === 'password';
   }
 
   clearAllAuthData() {
     this.logout(); 
-      sessionStorage.clear(); 
+    sessionStorage.clear(); 
   }
-
-
-
 }
