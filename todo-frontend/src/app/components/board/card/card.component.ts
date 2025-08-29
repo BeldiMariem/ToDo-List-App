@@ -72,4 +72,7 @@ export class CardComponent {
   canModifyComment(comment: CommentDTO): boolean {
     return comment.user.id === this.currentUser.id;
   }
+    get dragData() {
+    return this.card;
+  }
 }

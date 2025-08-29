@@ -1,0 +1,269 @@
+<div class="profile-container">
+  <div class="header">
+    <h2>User Profile</h2>
+    <p class="subtitle">Manage your account settings and preferences</p>
+  </div>
+
+  @if (message()) {
+    <div class="alert" [class.alert-success]="messageType() === 'success'" 
+                      [class.alert-error]="messageType() === 'error'">
+      <i class="fas" [class.fa-check-circle]="messageType() === 'success'" 
+                [class.fa-exclamation-circle]="messageType() === 'error'"></i>
+      <span>{{ message() }}</span>
+    </div>
+  }
+
+  <div class="profile-content">
+    
+    <div class="tabs">
+      <button class="tab-btn" [class.active]="activeTab() === 'profile'" 
+              (click)="selectTab('profile')">
+        <i class="fas fa-user"></i> Profile
+      </button>
+      
+      @if (hasPassword()) {
+        <button class="tab-btn" [class.active]="activeTab() === 'password'" 
+                (click)="selectTab('password')">
+          <i class="fas fa-lock"></i> Password
+        </button>
+      }
+      
+      <button class="tab-btn" [class.active]="activeTab() === 'delete'" 
+              (click)="selectTab('delete')">
+        <i class="fas fa-trash"></i> Delete Account
+      </button>
+    </div>
+
+    <div class="tab-content">
+      
+      @if (activeTab() === 'profile') {
+        <div class="profile-card">
+          <div class="card-header">
+            <h3>Profile Information</h3>
+            <p>Update your personal information</p>
+          </div>
+          
+          <div class="avatar-section">
+            <div class="avatar">
+              <img src="https://cdn-icons-png.flaticon.com/512/7915/7915522.png" 
+                   alt="Profile Avatar">
+            </div>
+          </div>
+
+          <form [formGroup]="profileForm" (ngSubmit)="onUpdateProfile()">
+            
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input type="text" id="username" formControlName="username" 
+                     [class.invalid]="profileForm.get('username')?.invalid && profileForm.get('username')?.touched">
+              
+              @if (profileForm.get('username')?.invalid && profileForm.get('username')?.touched) {
+                <div class="error-message">
+                  @if (profileForm.get('username')?.errors?.['required']) {
+                    <span>Username is required</span>
+                  }
+                  @if (profileForm.get('username')?.errors?.['minlength']) {
+                    <span>Username must be at least 3 characters</span>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" formControlName="email" 
+                     [class.invalid]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
+              
+              @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
+                <div class="error-message">
+                  @if (profileForm.get('email')?.errors?.['required']) {
+                    <span>Email is required</span>
+                  }
+                  @if (profileForm.get('email')?.errors?.['email']) {
+                    <span>Please enter a valid email</span>
+                  }
+                </div>
+              }
+            </div>
+
+            <button type="submit" class="btn-primary" 
+                    [disabled]="profileForm.invalid || isLoading()">
+              @if (isLoading()) {
+                <i class="fas fa-spinner fa-spin"></i>
+              }
+              Update Profile
+            </button>
+          </form>
+        </div>
+      }
+
+      @if (activeTab() === 'password' && hasPassword()) {
+        <div class="profile-card">
+          <div class="card-header">
+            <h3>Change Password</h3>
+            <p>Update your password to keep your account secure</p>
+          </div>
+
+          <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()">
+            
+            <div class="form-group">
+              <label for="oldPassword">Current Password</label>
+              <input type="password" id="oldPassword" formControlName="oldPassword" 
+                     [class.invalid]="passwordForm.get('oldPassword')?.invalid && passwordForm.get('oldPassword')?.touched">
+              
+              @if (passwordForm.get('oldPassword')?.invalid && passwordForm.get('oldPassword')?.touched) {
+                <div class="error-message">
+                  @if (passwordForm.get('oldPassword')?.errors?.['required']) {
+                    <span>Current password is required</span>
+                  }
+                  @if (passwordForm.get('oldPassword')?.errors?.['minlength']) {
+                    <span>Password must be at least 6 characters</span>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="newPassword">New Password</label>
+              <input type="password" id="newPassword" formControlName="newPassword" 
+                     [class.invalid]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched">
+              
+              @if (passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched) {
+                <div class="error-message">
+                  @if (passwordForm.get('newPassword')?.errors?.['required']) {
+                    <span>New password is required</span>
+                  }
+                  @if (passwordForm.get('newPassword')?.errors?.['minlength']) {
+                    <span>Password must be at least 6 characters</span>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword">Confirm New Password</label>
+              <input type="password" id="confirmPassword" formControlName="confirmPassword" 
+                     [class.invalid]="(passwordForm.get('confirmPassword')?.invalid || passwordForm.errors?.['mismatch']) && passwordForm.get('confirmPassword')?.touched">
+              
+              @if ((passwordForm.get('confirmPassword')?.invalid || passwordForm.errors?.['mismatch']) && passwordForm.get('confirmPassword')?.touched) {
+                <div class="error-message">
+                  @if (passwordForm.get('confirmPassword')?.errors?.['required']) {
+                    <span>Please confirm your password</span>
+                  }
+                  @if (passwordForm.errors?.['mismatch']) {
+                    <span>Passwords do not match</span>
+                  }
+                </div>
+              }
+            </div>
+
+            <button type="submit" class="btn-primary" 
+                    [disabled]="passwordForm.invalid || isLoading()">
+              @if (isLoading()) {
+                <i class="fas fa-spinner fa-spin"></i>
+              }
+              Change Password
+            </button>
+          </form>
+        </div>
+      }
+
+      @if (activeTab() === 'delete') {
+        <div class="profile-card danger-card">
+          <div class="card-header">
+            <h3>Delete Account</h3>
+            <p>Permanently delete your account and all associated data</p>
+          </div>
+
+          <div class="warning-section">
+            <div class="warning-icon">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="warning-content">
+              <h4>Warning</h4>
+              <p>This action cannot be undone. All your data will be permanently removed from our systems.</p>
+            </div>
+          </div>
+         @if (  hasPassword()) {
+          <form [formGroup]="deleteForm" (ngSubmit)="showDeleteModal.set(true)">
+            <div class="form-group">
+              <label for="deletePassword">Enter your password to confirm</label>
+              <input type="password" id="deletePassword" formControlName="password" 
+                     [class.invalid]="deleteForm.get('password')?.invalid && deleteForm.get('password')?.touched">
+              
+              @if (deleteForm.get('password')?.invalid && deleteForm.get('password')?.touched) {
+                <div class="error-message">
+                  Password is required to confirm account deletion
+                </div>
+              }
+            </div>
+           
+            <button type="submit" class="btn-danger" [disabled]="deleteForm.invalid">
+              Delete Account
+            </button>
+          </form>
+          } @else {
+            <button  class="btn-danger" (click)="showDeleteGoogleModal.set(true)">
+              Delete Account
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (showDeleteModal()) {
+    <div class="modal-backdrop" (click)="showDeleteModal.set(false)">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Confirm Account Deletion</h3>
+          <button class="close-btn" (click)="showDeleteModal.set(false)">×</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="delete-warning">
+            <i class="fas fa-exclamation-circle"></i>
+            <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-secondary" (click)="showDeleteModal.set(false)">Cancel</button>
+          <button class="btn-danger" (click)="onDeleteAccount()" [disabled]="isLoading()">
+            @if (isLoading()) {
+              <i class="fas fa-spinner fa-spin"></i>
+            }
+            Delete Account
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+  @if (showDeleteGoogleModal()) {
+    <div class="modal-backdrop" (click)="showDeleteGoogleModal.set(false)">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Confirm Account Deletion</h3>
+          <button class="close-btn" (click)="showDeleteGoogleModal.set(false)">×</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="delete-warning">
+            <i class="fas fa-exclamation-circle"></i>
+            <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-secondary" (click)="showDeleteGoogleModal.set(false)">Cancel</button>
+          <button class="btn-danger" (click)="onDeleteAccount()" [disabled]="isLoading()">
+            @if (isLoading()) {
+              <i class="fas fa-spinner fa-spin"></i>
+            }
+            Delete Account
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

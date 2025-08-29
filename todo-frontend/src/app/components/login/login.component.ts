@@ -84,7 +84,7 @@ export class LoginComponent {
 
   forgotPassword(event: Event) {
     event.preventDefault();
-    this.router.navigate(['/forgot-password']);
+    this.router.navigate(['/request-reset']);
   }
 
   goToRegister(event: Event) {

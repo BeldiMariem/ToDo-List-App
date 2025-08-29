@@ -61,6 +61,12 @@ public class UserServiceImpl implements UserService {
 
         userRepository.delete(user);
     }
+    @Override
+    @Transactional
+    public void deleteGoogleUser(Long userId) {
+        User user = findUserById(userId);
+        userRepository.delete(user);
+    }
 
     private User findUserById(Long userId) {
         return userRepository.findById(userId)

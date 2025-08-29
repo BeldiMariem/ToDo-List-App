@@ -57,7 +57,7 @@ export class ListComponent {
     return (this.getCompletedCount() / this.list.cards.length) * 100;
   }
 
-startEdit(): void {
+  startEdit(): void {
     this.isEditing = true;
     this.editedName = this.list.name;
     this.editedColor = this.list.color;
@@ -71,16 +71,20 @@ startEdit(): void {
     }, 100);
   }
 
-  saveEdit(): void {
-    if (this.editedName.trim() && this.editedColor) {
-      this.updateList.emit({
-        listId: this.list.id,
-        name: this.editedName.trim(),
-        color: this.editedColor
-      });
-      this.isEditing = false;
-    }
+saveEdit(): void {
+  if (this.editedName && this.editedColor) {
+    this.list.name = this.editedName;
+    this.list.color = this.editedColor;
+
+    this.updateList.emit({
+      listId: this.list.id,
+      name: this.editedName,
+      color: this.editedColor
+    });
+
+    this.isEditing = false;
   }
+}
 
   cancelEdit(): void {
     this.isEditing = false;
