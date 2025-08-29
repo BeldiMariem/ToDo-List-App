@@ -15,7 +15,7 @@ export class AuthService {
 
   private readonly STORAGE_KEY = 'auth_token';
   private readonly USER_STORAGE_KEY = 'current_user';
-    private _loginMethod = signal<'password' | 'google' | null>(null);
+  private _loginMethod = signal<'password' | 'google' | null>(null);
   readonly loginMethod = computed(() => this._loginMethod());
 
 
@@ -79,7 +79,7 @@ export class AuthService {
 
   login(payload: LoginRequest) {
     this._state.update(s => ({ ...s, loading: true, error: null }));
-    
+
     this.http.post<JwtResponse>(`${environment.apiUrl}/auth/login`, payload)
       .subscribe({
         next: (res) => {
@@ -94,9 +94,9 @@ export class AuthService {
         }
       });
   }
- handleOAuthToken(token: string) {
+  handleOAuthToken(token: string) {
     this._state.set({ token: token, loading: false, error: null });
-    this._loginMethod.set('google'); 
+    this._loginMethod.set('google');
     this.fetchCurrentUserFromToken();
   }
 
@@ -150,8 +150,8 @@ export class AuthService {
     }
   }
 
-  
-  
+
+
   handleAuthError(errorMessage: string) {
     this._state.update(s => ({ ...s, loading: false, error: errorMessage }));
   }
@@ -196,15 +196,29 @@ export class AuthService {
       return '';
     }
   }
+  forgotPassword(email: string) {
+    return this.http.post(`${environment.apiUrl}/auth/forgot-password?email=${email}`, null, {
+      responseType: 'text'
+    });
+  }
+
+  resetPassword(token: string, newPassword: string) {
+    return this.http.post(
+      `${environment.apiUrl}/auth/reset-password`,
+      { token, newPassword },
+      { responseType: 'text' }
+    );
+  }
+
 
   logout() {
     this._state.set({ token: null, loading: false, error: null });
     this._currentUser.set(null);
-    this._loginMethod.set(null); 
-    
+    this._loginMethod.set(null);
+
     localStorage.removeItem(this.STORAGE_KEY);
     localStorage.removeItem(this.USER_STORAGE_KEY);
-    
+
     this.router.navigateByUrl('/login');
   }
 
@@ -213,7 +227,7 @@ export class AuthService {
   }
 
   clearAllAuthData() {
-    this.logout(); 
-    sessionStorage.clear(); 
+    this.logout();
+    sessionStorage.clear();
   }
 }

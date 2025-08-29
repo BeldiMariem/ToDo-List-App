@@ -3,5 +3,8 @@ export interface UserDTO {
   username: string;
   email?: string;
   hasPassword?: boolean;
+  resetToken?: string;
+  tokenExpiryDate?:Date;
+
 
 }

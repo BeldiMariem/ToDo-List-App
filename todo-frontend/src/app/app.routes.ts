@@ -8,7 +8,11 @@ export const routes: Routes = [
   { path: 'register', loadComponent: () => import('../app/components/register/register.component').then(m => m.RegisterComponent) },
   { path: 'oauth2/redirect', loadComponent: () => import('../app/components/oauth/oauth-redirect.component').then(m => m.OAuthRedirectComponent) },
   { path: 'logout', loadComponent: () => import('../app/components/logout/logout.component').then(m => m.LogoutComponent) },
+  { path: 'reset-password', loadComponent: () => import('../app/components/password/reset-password/reset-password.component').then(m => m.ResetPasswordComponent) },
+  { path: 'request-reset', loadComponent: () => import('../app/components/password/request-reset/request-reset.component').then(m => m.RequestResetComponent) },
+
   { path: '', loadComponent: () => import('../app/components/welcome/welcome.component').then(m => m.WelcomeComponent) },
+
 
 
 

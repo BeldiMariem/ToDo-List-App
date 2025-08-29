@@ -15,8 +15,9 @@ This is the backend for a Trello-like task management application, containerized
 - DTO separation using MapStruct
 - Controller testing using **MockMvc** and **H2 database**
 - Continuous Integration & Deployment using **Jenkins** and **Nexus**
-
-
+- Forgot password functionality
+   - Backend endpoints for requesting a password reset and updating the password
+   - Sends a password reset email to the user
 ## ⚙️ Tech Stack
 
 | Tool           | Purpose                        |
@@ -24,6 +25,7 @@ This is the backend for a Trello-like task management application, containerized
 | Spring Boot    | Main backend framework         |
 | PostgreSQL     | Main relational database       |
 | H2             | In-memory DB for testing       |
+| JavaMail / Spring Mail | Sending emails for password reset |
 | Spring Security| JWT authentication             |
 | MapStruct      | Entity ↔ DTO mapping           |
 | Swagger (OpenAPI) | API documentation         |
