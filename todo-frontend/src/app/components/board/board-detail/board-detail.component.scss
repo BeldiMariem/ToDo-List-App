@@ -1025,3 +1025,15 @@
     margin-top: 0;
   }
 }
+
+
+
+.cdk-drag-preview {
+  background: red !important;
+  opacity: 0.8;
+}
+
+.cdk-drag-placeholder {
+  background: blue !important;
+  opacity: 0.3;
+}

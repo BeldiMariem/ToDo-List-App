@@ -53,7 +53,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/deleteUser")
+    @PutMapping("/deleteUser")
     public ResponseEntity<Void> deleteUser(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody UserDeleteRequestDTO dto) {
@@ -62,6 +62,14 @@ public class UserController {
         userService.deleteUser(userId, dto.getPassword());
         return ResponseEntity.noContent().build();
     }
+    @DeleteMapping("/deleteGoogleUser")
+    public ResponseEntity<Void> deleteGoogleUser(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Long userId = getUserIdFromPrincipal(userDetails);
+        userService.deleteGoogleUser(userId);
+        return ResponseEntity.noContent().build();
+    }
+
 
     private Long getUserIdFromPrincipal(UserDetails userDetails) {
         if (userDetails instanceof CustomUserDetails) {

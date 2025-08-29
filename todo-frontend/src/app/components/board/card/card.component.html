@@ -1,4 +1,4 @@
-<div cdkDrag class="card" [style.borderTopColor]="color">
+<div cdkDrag [cdkDragData]="dragData" class="card" [style.borderTopColor]="color">
   <div class="card-content">
     <button class="card-delete-btn" (click)="onDelete()" title="Delete Task">
       <i class="fas fa-times"></i>

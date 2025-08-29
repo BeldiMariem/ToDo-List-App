@@ -18,7 +18,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
 
 import { ListComponent } from '../list/list.component';
-import { moveItemInArray, transferArrayItem,CdkDragDrop, CdkDropListGroup,DragDropModule  } from '@angular/cdk/drag-drop';
+import { moveItemInArray, transferArrayItem, CdkDragDrop, CdkDropListGroup, DragDropModule } from '@angular/cdk/drag-drop';
 import { FormsModule } from '@angular/forms';
 
 
@@ -31,7 +31,7 @@ interface ListWithCards extends ListDTO {
   templateUrl: './board-detail.component.html',
   styleUrls: ['./board-detail.component.scss'],
   standalone: true,
-  imports: [CommonModule, CdkDropListGroup, ListComponent, FormsModule,DragDropModule]
+  imports: [CommonModule, CdkDropListGroup, ListComponent, FormsModule, DragDropModule]
 })
 export class BoardDetailComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
@@ -483,25 +483,28 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
   getTotalTasks(): number {
     return this.lists.reduce((acc, list) => acc + list.cards.length, 0);
   }
-  
-  onUpdateList(event: { listId: number, name: string, color: string }) {
-    this.listService.updateList({
-      id: event.listId,
-      name: event.name,
-      color: event.color
-    }).pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (updatedList) => {
-          const index = this.lists.findIndex(l => l.id === event.listId);
-          if (index !== -1) {
-            this.lists[index] = { ...this.lists[index], ...updatedList };
-          }
-        },
-        error: (error) => {
-          console.error('Failed to update list. Please try again.', error);
+
+onUpdateList(event: { listId: number, name: string, color: string }) {
+  this.listService.updateList({
+    id: event.listId,
+    name: event.name,
+    color: event.color
+  }).pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (updatedList) => {
+        const index = this.lists.findIndex(l => l.id === event.listId);
+        if (index !== -1) {
+          this.lists = this.lists.map((list, i) => 
+            i === index ? { ...list, ...updatedList } : list
+          );
         }
-      });
-  }
+      },
+      error: (error) => {
+        console.error('Failed to update list. Please try again.', error);
+      }
+    });
+}
+
   onDeleteCard(cardId: number, listId: number) {
     if (confirm('Are you sure you want to delete this task?')) {
       this.cardService.deleteCard(cardId)
@@ -522,7 +525,7 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
   }
   onListDrop(event: CdkDragDrop<any[]>) {
     moveItemInArray(this.lists, event.previousIndex, event.currentIndex);
-      }
+  }
 
   onDeleteList(listId: number) {
     if (confirm('Are you sure you want to delete this list? All tasks in this list will also be deleted.')) {

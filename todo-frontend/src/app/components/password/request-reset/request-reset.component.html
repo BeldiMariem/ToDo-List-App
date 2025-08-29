@@ -1,0 +1,47 @@
+<div class="login-page">
+  <div class="login-left">
+    <h1>Reset your password</h1>
+    <p class="subtitle">Enter your email to receive a reset link</p>
+
+    @if (message) {
+    <div class="error-message" [class.success]="isSuccess">
+      <i class="fas" [class.fa-exclamation-circle]="!isSuccess" [class.fa-check-circle]="isSuccess"></i>
+      {{ message }}
+    </div>
+    }
+
+    <form (ngSubmit)="onSubmit()" #requestResetForm="ngForm">
+      <div class="form-field">
+        <label for="email">Email</label>
+        <input id="email" type="email" [(ngModel)]="email" name="email" placeholder="Enter your email" required
+          [class.error]="showEmailError" (input)="clearError()" />
+        @if (showEmailError) {
+        <div class="field-error">
+          <i class="fas fa-exclamation-triangle"></i>
+          Valid email is required
+        </div>
+        }
+      </div>
+
+      <button type="submit" class="login-button" [disabled]="isLoading">
+        @if (!isLoading) {
+        <span>Send Reset Link</span>
+        }
+        @if (isLoading) {
+        <span>Sending...</span>
+        }
+      </button>
+
+      <div class="signup-prompt">
+        Remember your password?
+        <a routerLink="/login">Sign in</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="login-right">
+    <img
+      src="https://media.istockphoto.com/id/1219250750/vector/online-registration-and-sign-up-concept-people-signing-up-or-login-to-online-account-with.jpg?s=612x612&w=0&k=20&c=1IEI_a33YhMHcZorJNzA5ECND__5WiILMHErwlWsu6E="
+      alt="Password Reset Illustration" class="illustration" />
+  </div>
+</div>
