@@ -1,0 +1,56 @@
+<div class="main-layout" [class.sidebar-collapsed]="isSidebarCollapsed"
+    [class.notification-panel-open]="isNotificationPanelOpen">
+    <app-sidebar [isCollapsed]="isSidebarCollapsed" (menuItemSelected)="onMenuItemSelected($event)"
+        (toggleSidebar)="onSidebarToggle()" (toggleNotificationPanel)="onToggleNotificationPanel()">
+    </app-sidebar>
+    <div class="content">
+        <router-outlet></router-outlet>
+    </div>
+
+    <div class="notification-panel-overlay" (click)="closeNotificationPanel()" [class.active]="isNotificationPanelOpen">
+    </div>
+
+    <div class="notification-panel" [class.active]="isNotificationPanelOpen">
+        <div class="notification-panel-header">
+            <h3>Notifications</h3>
+
+            <div class="debug-info" style="font-size: 12px; color: #666; margin-top: 5px;">
+                Total: {{notifications.length}}, Unread: {{unreadCount}}
+            </div>
+        </div>
+        <div class="notification-panel-content">
+
+            @for (notification of notifications; track notification.id; let i = $index) {
+                <div class="notification-item"
+                    [class.unread]="!getSeenStatus(notification)" [class.read]="getSeenStatus(notification)">
+                    <div class="notification-content">
+                        <i class="fas notification-icon"></i>
+                        <div class="notification-details">
+                            <p class="notification-message">
+                                {{ getNotificationMessage(notification) }}
+                            </p>
+                        </div>
+                        @if (!getSeenStatus(notification)) {
+                            <span class="unread-indicator" title="Unread"></span>
+                        }
+                    </div>
+                    @if (!getSeenStatus(notification)) {
+                        <div class="notification-actions">
+                            <button class="mark-read-btn"
+                                (click)="markAsRead(getNotificationId(notification)); $event.stopPropagation()">
+                                <i class="fas fa-check"></i> Mark as read
+                            </button>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (notifications.length === 0) {
+                <div class="empty-state">
+                    <i class="fas fa-bell-slash"></i>
+                    <p>No notifications yet</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

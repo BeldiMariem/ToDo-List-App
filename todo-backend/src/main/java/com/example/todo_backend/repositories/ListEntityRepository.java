@@ -9,7 +9,5 @@ import com.example.todo_backend.entities.ListEntity;
 
 @Repository
 public interface ListEntityRepository extends JpaRepository<ListEntity, Long> {
-
-    List<ListEntity> findByBoard_Id(Long boardId);
-
+    List<ListEntity> findByBoardId(Long boardId);
 }

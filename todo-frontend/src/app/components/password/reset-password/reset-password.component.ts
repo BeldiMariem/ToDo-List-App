@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -12,25 +12,26 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrls: ['./reset-password.component.scss']
 })
 export class ResetPasswordComponent {
-  newPassword: string = '';
-  confirmPassword: string = '';
-  message: string = '';
-  token: string = '';
+  newPassword!: string;
+  confirmPassword!: string;
+  message!: string ;
+  token!: string ;
   isLoading = false;
   showPasswordError = false;
   showConfirmError = false;
   confirmError = '';
   isSuccess = false;
 
-  constructor(
-    private authService: AuthService, 
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
-    this.token = this.route.snapshot.queryParamMap.get('token') || '';
-  }
+    private authService = inject(AuthService);
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+
+
+  
 
   onSubmit() {
+    this.token = this.route.snapshot.queryParamMap.get('token') || '';
+
     this.clearErrors();
     
     let hasError = false;
