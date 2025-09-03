@@ -1,7 +1,7 @@
 import { FormsModule } from '@angular/forms';
 import { BoardDTO } from '../../../core/models/board.model';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, effect, ChangeDetectionStrategy } from '@angular/core';
 import { BoardService } from '../../../core/services/board.service';
 import { Router } from '@angular/router';
 
@@ -10,7 +10,8 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './board-manegement.component.html',
-  styleUrls: ['./board-manegement.component.scss']
+  styleUrls: ['./board-manegement.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BoardManegementComponent implements OnInit {
   public boardService = inject(BoardService);
@@ -19,6 +20,7 @@ export class BoardManegementComponent implements OnInit {
   boards = this.boardService.boards;
   loading = this.boardService.loading;
   error = this.boardService.error;
+  progressValues = signal<number[]>([]);
 
   viewMode = signal<'grid' | 'list' | 'masonry'>('grid');
   
@@ -31,14 +33,17 @@ export class BoardManegementComponent implements OnInit {
 
   private colorGradients = [
     'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-    'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-    'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-    'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-    'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-    'linear-gradient(135deg, #5ee7df 0%, #b490ca 100%)',
-    'linear-gradient(135deg, #d299c2 0%, #fef9d7 100%)'
+    'linear-gradient(135deg, #5e99e7ff 0%, #b490ca 100%)',
   ];
+
+  constructor() {
+    effect(() => {
+      const boards = this.boards();
+      if (boards && boards.length > 0) {
+        this.progressValues.set(boards.map(() => Math.floor(Math.random() * 100)));
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.boardService.getBoards();
@@ -104,7 +109,7 @@ export class BoardManegementComponent implements OnInit {
     return this.colorGradients[index % this.colorGradients.length];
   }
 
-  getRandomProgress(): number {
-    return Math.floor(Math.random() * 100);
+  getStableProgress(boardId: number): number {
+    return 30 + (boardId * 13) % 65;
   }
 }

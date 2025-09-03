@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import com.example.todo_backend.security.CustomOAuth2UserService;
 import com.example.todo_backend.security.CustomUserDetailsService;
 import com.example.todo_backend.security.JwtAuthFilter;
@@ -53,7 +54,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/oauth2/**",
                                 "/login/oauth2/**",
-                                "/oauth2/authorization/**"
+                                "/oauth2/authorization/**",
+                                "/ws/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

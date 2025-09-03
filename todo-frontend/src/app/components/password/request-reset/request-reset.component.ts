@@ -12,8 +12,8 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrls: ['./request-reset.component.scss']
 })
 export class RequestResetComponent {
-  email: string = '';
-  message: string = '';
+  email = '';
+  message = '';
   isLoading = false;
   showEmailError = false;
   isSuccess = false;

@@ -3,13 +3,16 @@
     <h2>Your Boards</h2>
     <div class="header-controls">
       <div class="view-options">
-        <button class="view-btn" [class.active]="viewMode() === 'grid'" (click)="viewMode.set('grid')" title="Grid View">
+        <button class="view-btn" [class.active]="viewMode() === 'grid'" (click)="viewMode.set('grid')"
+          title="Grid View">
           <i class="fas fa-th-large"></i>
         </button>
-        <button class="view-btn" [class.active]="viewMode() === 'list'" (click)="viewMode.set('list')" title="List View">
+        <button class="view-btn" [class.active]="viewMode() === 'list'" (click)="viewMode.set('list')"
+          title="List View">
           <i class="fas fa-list"></i>
         </button>
-        <button class="view-btn" [class.active]="viewMode() === 'masonry'" (click)="viewMode.set('masonry')" title="Masonry View">
+        <button class="view-btn" [class.active]="viewMode() === 'masonry'" (click)="viewMode.set('masonry')"
+          title="Masonry View">
           <i class="fas fa-th"></i>
         </button>
       </div>
@@ -20,117 +23,111 @@
   </div>
 
   @if (loading()) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading your boards...</p>
-    </div>
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading your boards...</p>
+  </div>
   } @else if (error()) {
-    <div class="error-state">
-      <i class="fas fa-exclamation-triangle"></i>
-      <p>{{ error() }}</p>
-      <button class="btn-retry" (click)="boardService.getBoards()">Try Again</button>
-    </div>
+  <div class="error-state">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>{{ error() }}</p>
+    <button class="btn-retry" (click)="boardService.getBoards()">Try Again</button>
+  </div>
   } @else if (boards().length > 0) {
-    <div class="board-content" [class.grid-view]="viewMode() === 'grid'" 
-         [class.list-view]="viewMode() === 'list'" [class.masonry-view]="viewMode() === 'masonry'">
-      
-      @for (board of boards(); track board.id) {
-        <div class="board-card" [style.background]="getBoardGradient($index)" 
-             [class.list-card]="viewMode() === 'list'" (click)="openBoard(board.id)">
-          <div class="card-content">
-            <h3>{{ board.name }}</h3>
-            
-            <div class="card-meta">
-              <div class="card-actions">
-                <button class="icon-btn" (click)="openBoard(board.id)" title="Open Board">
-                  <i class="fas fa-arrow-right"></i>
-                </button>
-                <button class="icon-btn" (click)="$event.stopPropagation(); openDeleteModal(board)" title="Delete Board">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          <div class="card-footer">
-            <div class="progress-bar">
-              <div class="progress-fill" [style.width]="getRandomProgress() + '%'"></div>
-            </div>
+  <div class="board-content" [class.grid-view]="viewMode() === 'grid'" [class.list-view]="viewMode() === 'list'"
+    [class.masonry-view]="viewMode() === 'masonry'">
+
+    @for (board of boards(); track board.id) {
+    <div class="board-card" [style.background]="getBoardGradient($index)" [class.list-card]="viewMode() === 'list'"
+      (click)="openBoard(board.id)">
+      <div class="card-content">
+        <h3>{{ board.name }}</h3>
+
+        <div class="card-meta">
+          <div class="card-actions">
+            <button class="icon-btn" (click)="openBoard(board.id)" title="Open Board">
+              <i class="fas fa-arrow-right"></i>
+            </button>
+            <button class="icon-btn" (click)="$event.stopPropagation(); openDeleteModal(board)" title="Delete Board">
+              <i class="fas fa-trash"></i>
+            </button>
           </div>
         </div>
-      }
-      
-      <div class="board-card create-card" (click)="toggleCreateModal()" 
-           [class.list-card]="viewMode() === 'list'">
-        <div class="create-content">
-          <i class="fas fa-plus"></i>
-          <h3>Create New Board</h3>
-          <p>Add a new board to organize your tasks</p>
+      </div>
+
+      <div class="card-footer">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width]="getStableProgress(board.id) + '%'"></div>
         </div>
       </div>
     </div>
+    }
+
+    <div class="board-card create-card" (click)="toggleCreateModal()" [class.list-card]="viewMode() === 'list'">
+      <div class="create-content">
+        <i class="fas fa-plus"></i>
+        <h3>Create New Board</h3>
+        <p>Add a new board to organize your tasks</p>
+      </div>
+    </div>
+  </div>
   } @else {
-    <div class="empty-state">
-      <div class="empty-illustration">
-        <i class="fas fa-chalkboard"></i>
-      </div>
-      <h3>No Boards Yet</h3>
-      <p>Start by creating your first board and organize your work like a pro 🚀</p>
-      <button class="create-first-btn" (click)="toggleCreateModal()">
-        <i class="fas fa-plus"></i> Create Your First Board
-      </button>
+  <div class="empty-state">
+    <div class="empty-illustration">
+      <i class="fas fa-chalkboard"></i>
     </div>
+    <h3>No Boards Yet</h3>
+    <p>Start by creating your first board and organize your work like a pro 🚀</p>
+    <button class="create-first-btn" (click)="toggleCreateModal()">
+      <i class="fas fa-plus"></i> Create Your First Board
+    </button>
+  </div>
   }
 
   @if (showCreateModal()) {
-    <div class="modal-backdrop" (click)="toggleCreateModal()">
-      <div class="modal" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h3>Create New Board</h3>
-          <button class="close-btn" (click)="toggleCreateModal()">×</button>
-        </div>
+  <div class="modal-backdrop" (click)="toggleCreateModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Create New Board</h3>
+        <button class="close-btn" (click)="toggleCreateModal()">×</button>
+      </div>
 
-        <div class="modal-body">
-          <label for="boardName">Board Name</label>
-          <input 
-            id="boardName" 
-            type="text" 
-            [ngModel]="newBoardName()" 
-            (ngModelChange)="newBoardName.set($event)"
-            placeholder="Enter board name..." 
-            (keyup.enter)="createBoard()"
-          />
-        </div>
+      <div class="modal-body">
+        <label for="boardName">Board Name</label>
+        <input id="boardName" type="text" [ngModel]="newBoardName()" (ngModelChange)="newBoardName.set($event)"
+          placeholder="Enter board name..." (keyup.enter)="createBoard()" />
+      </div>
 
-        <div class="modal-footer">
-          <button class="btn-secondary" (click)="toggleCreateModal()">Cancel</button>
-          <button class="btn-primary" (click)="createBoard()" [disabled]="!newBoardName().trim() || isCreating()">
-            {{ isCreating() ? 'Creating...' : 'Create Board' }}
-          </button>
-        </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="toggleCreateModal()">Cancel</button>
+        <button class="btn-primary" (click)="createBoard()" [disabled]="!newBoardName().trim() || isCreating()">
+          {{ isCreating() ? 'Creating...' : 'Create Board' }}
+        </button>
       </div>
     </div>
+  </div>
   }
 
   @if (showDeleteModal() && boardToDelete()) {
-    <div class="modal-backdrop" (click)="closeDeleteModal()">
-      <div class="modal" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h3>Delete Board</h3>
-          <button class="close-btn" (click)="closeDeleteModal()">×</button>
-        </div>
+  <div class="modal-backdrop" (click)="closeDeleteModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Delete Board</h3>
+        <button class="close-btn" (click)="closeDeleteModal()">×</button>
+      </div>
 
-        <div class="modal-body">
-          <p>Are you sure you want to delete the board "<strong>{{ boardToDelete()!.name }}</strong>"? This action cannot be undone.</p>
-        </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the board "<strong>{{ boardToDelete()!.name }}</strong>"? This action cannot
+          be undone.</p>
+      </div>
 
-        <div class="modal-footer">
-          <button class="btn-secondary" (click)="closeDeleteModal()">Cancel</button>
-          <button class="btn-danger" (click)="deleteBoard()" [disabled]="isDeleting()">
-            {{ isDeleting() ? 'Deleting...' : 'Delete Board' }}
-          </button>
-        </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeDeleteModal()">Cancel</button>
+        <button class="btn-danger" (click)="deleteBoard()" [disabled]="isDeleting()">
+          {{ isDeleting() ? 'Deleting...' : 'Delete Board' }}
+        </button>
       </div>
     </div>
+  </div>
   }
 </div>

@@ -26,6 +26,13 @@ interface ListWithCards extends ListDTO {
   cards: (CardDTO & { comments: CommentDTO[]; newComment: string })[];
 }
 
+interface BoardMemberWithDetails {
+  userId: number;
+  role: string;
+  email: string;
+  username: string;
+}
+
 @Component({
   selector: 'app-board-detail',
   templateUrl: './board-detail.component.html',
@@ -45,7 +52,7 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
 
-  boardMembersWithDetails: any[] = [];
+  boardMembersWithDetails: BoardMemberWithDetails[] = [];
   boardId!: number;
   board: BoardDTO | null = null;
   lists: ListWithCards[] = [];

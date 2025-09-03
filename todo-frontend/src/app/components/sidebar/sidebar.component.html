@@ -8,48 +8,62 @@
     </button>
   </div>
 
-  <div class="user-profile" *ngIf="isAuthenticated()">
-    <div class="avatar">
-      <img src="https://static.vecteezy.com/system/resources/previews/022/450/297/non_2x/3d-minimal-purple-user-profile-avatar-icon-in-circle-white-frame-design-vector.jpg" alt="User Avatar">
+  @if (isAuthenticated) {
+    <div class="user-profile">
+      <div class="avatar">
+        <img src="https://static.vecteezy.com/system/resources/previews/022/450/297/non_2x/3d-minimal-purple-user-profile-avatar-icon-in-circle-white-frame-design-vector.jpg" alt="User Avatar">
+      </div>
+      <div class="user-info">
+        <h3>{{ currentUser!.username || userEmail }}</h3>
+      </div>
     </div>
-    <div class="user-info">
-      <h3>{{ currentUser().username || userEmail() }}</h3>
-    </div>
-  </div>
+  }
 
   <nav class="sidebar-nav">
     <ul class="nav-menu">
-      <li [class.active]="dashboardActive" >
+      <li [class.active]="dashboardActive" (click)="onMenuItemClick('dashboard')">
         <i class="fas fa-grid"></i>
         <span>Dashboard</span>
       </li>
       
-      <li [class.active]="boardsActive" >
+      <li [class.active]="boardsActive" (click)="onMenuItemClick('boards')">
         <i class="fas fa-list-check"></i>
         <span routerLink="/boards">My Boards</span>
       </li>
-       <li [class.active]="teamActive">
-        <i class="fas fa-cog"></i>
-        <span routerLink="/profile">Profile Settings</span>
+      
+      <li class="notification-item" (click)="onNotificationsClick()">
+        <i class="fas fa-bell"></i>
+        <span>Notifications</span>
+        <div class="notification-badge-container">
+          @if (unreadCount > 0) {
+            <span class="notification-badge">{{ unreadCount }}</span>
+          }
+        </div>
       </li>
       
-      <li [class.active]="tasksActive">
+      <li [class.active]="tasksActive" (click)="onMenuItemClick('tasks')">
         <i class="fas fa-check-square"></i>
         <span>Tasks</span>
       </li>
       
-      <li [class.active]="calendarActive">
+      <li [class.active]="calendarActive" (click)="onMenuItemClick('calendar')">
         <i class="fas fa-calendar"></i>
         <span>Calendar</span>
       </li>
       
+      <li [class.active]="teamActive" (click)="onMenuItemClick('profile')">
+        <i class="fas fa-cog"></i>
+        <span routerLink="/profile">Profile Settings</span>
+      </li>
     </ul>
 
     <ul class="nav-menu bottom-menu">
-      <li [class.active]="logoutActive" >
-        <i class="fas fa-log-out"></i>
+      <li [class.active]="logoutActive" (click)="onMenuItemClick('logout')">
+        <i class="fas fa-arrow-left	"></i>
         <span routerLink="/logout">Logout</span>
       </li>
     </ul>
   </nav>
+
+
 </div>
