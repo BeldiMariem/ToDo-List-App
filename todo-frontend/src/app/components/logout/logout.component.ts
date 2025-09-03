@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { AuthService } from '../../core/services/auth.service';
 import { Router } from '@angular/router';
 
@@ -18,7 +18,7 @@ import { Router } from '@angular/router';
     }
   `]
 })
-export class LogoutComponent {
+export class LogoutComponent implements OnInit{
   private authService = inject(AuthService);
   private router = inject(Router);
 

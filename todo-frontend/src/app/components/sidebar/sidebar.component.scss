@@ -1,10 +1,3 @@
-:host {
-  margin: 0;
-  padding: 0;
-  top:0;
-  left:0;
-}
-
 .sidebar {
   width: 280px;
   height: 100vh;
@@ -12,13 +5,15 @@
   color: #f8f9fa;
   display: flex;
   flex-direction: column;
-  transition: width 0.3s ease;  
+  transition: width 0.3s ease;
   border-right: 1px solid #3a3a4a;
   margin: 0;
   padding: 0;
-  top:0;
-  left:0;
+  top: 0;
+  left: 0;
   box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
 
   &.collapsed {
     width: 60px;
@@ -160,7 +155,8 @@
     &.active {
       background: rgba(67, 97, 238, 0.1);
 
-      i, span {
+      i,
+      span {
         color: #caaafa;
         font-weight: 600;
       }
@@ -173,77 +169,33 @@
   }
 }
 
-.notification-badge {
-  background: #f72585;
-  color: white;
-  font-size: 12px;
-  font-weight: 600;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+.notification-item {
+  position: relative;
+  cursor: pointer;
 
-.upgrade-card {
-  background: linear-gradient(135deg, #4361ee, #4895ef);
-  margin: 16px;
-  padding: 20px;
-  border-radius: 12px;
-  text-align: center;
+  .notification-badge-container {
+    position: relative;
+    display: inline-block;
 
-  .upgrade-icon {
-    width: 48px;
-    height: 48px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 12px;
-
-    i {
+    .notification-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background-color: #ff4757;
       color: white;
-      font-size: 20px;
-    }
-  }
-
-  h4 {
-    font-size: 16px;
-    margin-bottom: 8px;
-  }
-
-  p {
-    font-size: 14px;
-    opacity: 0.9;
-    margin-bottom: 16px;
-  }
-
-  .upgrade-btn {
-    background: white;
-    color: #4361ee;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
     }
   }
 }
 
-:host ::ng-deep {
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-}
+
 
 @media (max-width: 768px) {
   .sidebar {
@@ -252,8 +204,7 @@
     .logo span,
     .user-profile,
     .nav-menu li span,
-    .notification-badge,
-    .upgrade-card {
+    .notification-badge {
       display: none;
     }
 
