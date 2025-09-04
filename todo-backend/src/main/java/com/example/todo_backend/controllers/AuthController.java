@@ -1,6 +1,5 @@
 package com.example.todo_backend.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -30,9 +29,7 @@ public class AuthController {
     private final AuthService authService;
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
-
-    @Autowired
-    private PasswordResetService passwordResetService;
+    private final PasswordResetService passwordResetService;
 
     @PostMapping("/register")
     public ResponseEntity<UserDTO> registerUser(@RequestBody RegisterRequest request) {
