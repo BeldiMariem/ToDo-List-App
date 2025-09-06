@@ -21,14 +21,9 @@
 
   <nav class="sidebar-nav">
     <ul class="nav-menu">
-      <li [class.active]="dashboardActive" (click)="onMenuItemClick('dashboard')">
-        <i class="fas fa-grid"></i>
-        <span>Dashboard</span>
-      </li>
-      
-      <li [class.active]="boardsActive" (click)="onMenuItemClick('boards')">
+      <li [class.active]="activeItem === 'boards'" (click)="onMenuItemClick('boards')" routerLink="/boards">
         <i class="fas fa-list-check"></i>
-        <span routerLink="/boards">My Boards</span>
+        <span >My Boards</span>
       </li>
       
       <li class="notification-item" (click)="onNotificationsClick()">
@@ -41,29 +36,28 @@
         </div>
       </li>
       
-      <li [class.active]="tasksActive" (click)="onMenuItemClick('tasks')">
+      <li [class.active]="activeItem === 'activities'" (click)="onMenuItemClick('activities')"routerLink="/activities">
         <i class="fas fa-check-square"></i>
-        <span>Tasks</span>
+        <span >Activities</span>
       </li>
-      
-      <li [class.active]="calendarActive" (click)="onMenuItemClick('calendar')">
+
+      <li [class.active]="activeItem === 'calendar'" (click)="onMenuItemClick('calendar')" routerLink="/calendar">
         <i class="fas fa-calendar"></i>
-        <span>Calendar</span>
+        <span >Calendar</span>
       </li>
       
-      <li [class.active]="teamActive" (click)="onMenuItemClick('profile')">
+      
+      <li [class.active]="activeItem === 'profile'" (click)="onMenuItemClick('profile')" routerLink="/profile">
         <i class="fas fa-cog"></i>
-        <span routerLink="/profile">Profile Settings</span>
+        <span >Profile Settings</span>
       </li>
     </ul>
 
     <ul class="nav-menu bottom-menu">
-      <li [class.active]="logoutActive" (click)="onMenuItemClick('logout')">
-        <i class="fas fa-arrow-left	"></i>
-        <span routerLink="/logout">Logout</span>
+      <li [class.active]="activeItem === 'logout'" (click)="onMenuItemClick('logout')" routerLink="/logout">
+        <i class="fas fa-arrow-left"></i>
+        <span >Logout</span>
       </li>
     </ul>
   </nav>
-
-
 </div>

@@ -4,25 +4,59 @@
             <h1>{{ board?.name || 'Project Dashboard' }}</h1>
         </div>
 
-        <div class="header-actions">
+         <div class="header-actions">
             @if (boardMembersWithDetails && boardMembersWithDetails.length > 0) {
                 <div class="board-members">
                     <div class="members-label">Team:</div>
                     <div class="members-list">
-                        @for (member of boardMembersWithDetails | slice:0:4; track member) {
+                        @for (member of getVisibleMembers(); track member) {
                             <div class="member-container">
-                                <div class="member-avatar" (mouseenter)="showTooltip($event, member.email)"
-                                    (mouseleave)="hideTooltip()">
+                                <div class="member-avatar" 
+                                    (mouseenter)="showTooltip($event, member.email)"
+                                    (mouseleave)="hideTooltip()"
+                                    (click)="onMemberClick(member)">
                                     {{ getUserInitials(member.email) }}
                                 </div>
                             </div>
                         }
-                        @if (boardMembersWithDetails.length > 4) {
-                            <div class="member-count">
-                                +{{ boardMembersWithDetails.length - 4 }}
+                        @if (hasHiddenMembers()) {
+                            <div class="view-all-members" 
+                                (click)="toggleMemberExpansion()"
+                                (mouseenter)="showAllMembersTooltip($event)"
+                                (mouseleave)="hideTooltip()">
+                                +{{ getHiddenMembersCount() }}
+                                @if (isMembersExpanded) {
+                                    <i class="fas fa-chevron-up"></i>
+                                } @else {
+                                    <i class="fas fa-chevron-down"></i>
+                                }
                             </div>
                         }
                     </div>
+
+                    @if (isMembersExpanded) {
+                        <div class="expanded-members-panel">
+                            <div class="panel-header">
+                                <h4>Team Members</h4>
+                                <button class="close-panel" (click)="toggleMemberExpansion()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="members-grid">
+                                @for (member of boardMembersWithDetails; track member) {
+                                    <div class="expanded-member">
+                                        <div class="member-avatar-large">
+                                            {{ getUserInitials(member.email) }}
+                                        </div>
+                                        <div class="member-info">
+                                            <div class="member-email">{{ member.email }}</div>
+                                            <div class="member-role">{{ member.role }}</div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
 
                     <div class="custom-tooltip" [class.show]="isTooltipVisible" [style.left]="tooltipPosition.x + 'px'"
                         [style.top]="tooltipPosition.y + 'px'">
@@ -154,7 +188,10 @@
         @for (list of lists; track list) {
             <div class="stat-item" [style.borderLeftColor]="list.color">
                 <span class="stat-number">{{ list.cards.length }}</span>
-                <span class="stat-label">{{ list.name }}</span>
+                 
+                <span  class="stat-label" [title]="(list.name | titleTruncate:7).isTruncated ? list.name: list.name">
+          {{ (list.name | titleTruncate:7).displayText }}
+    </span>
             </div>
         }
     </div>

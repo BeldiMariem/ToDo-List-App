@@ -1,0 +1,334 @@
+<div class="activities-container">
+    <header class="activities-header">
+        <div class="header-main">
+            <h1>Schedule & Activities</h1>
+            <p class="header-subtitle">Manage your meetings, calls, and events</p>
+        </div>
+
+        <div class="header-actions">
+            <button class="btn-outline" (click)="toggleFilters()">
+                <i class="fas fa-filter"></i> Filters
+            </button>
+
+            <button class="btn-primary" (click)="openCreateModal()">
+                <i class="fas fa-plus"></i> Schedule Activity
+            </button>
+        </div>
+    </header>
+
+    <div class="stats-bar">
+        <div class="stat-item stat-item-total">
+            <span class="stat-number">{{ filteredActivities().length }}</span>
+            <span class="stat-label">Total Activities</span>
+        </div>
+
+        <div class="stat-item" style="border-left-color: #2196F3;">
+            <span class="stat-number">{{ meetingActivities().length }}</span>
+            <span class="stat-label">Meetings</span>
+        </div>
+
+        <div class="stat-item" style="border-left-color: #9C27B0;">
+            <span class="stat-number">{{ callActivities().length }}</span>
+            <span class="stat-label">Calls</span>
+        </div>
+
+        <div class="stat-item" style="border-left-color: #4CAF50;">
+            <span class="stat-number">{{ taskActivities().length }}</span>
+            <span class="stat-label">Tasks</span>
+        </div>
+
+        <div class="stat-item" style="border-left-color: #FF9800;">
+            <span class="stat-number">{{ eventActivities().length }}</span>
+            <span class="stat-label">Events</span>
+        </div>
+    </div>
+
+    <div class="filters-section" [class.show]="showFilters()">
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>Start Date</label>
+                <input type="date" [value]="filters().startDate ? (filters().startDate | date:'yyyy-MM-dd') : ''"
+                    (change)="onStartDateChange($event)">
+            </div>
+
+            <div class="filter-group">
+                <label>End Date</label>
+                <input type="date" [value]="filters().endDate ? (filters().endDate | date:'yyyy-MM-dd') : ''"
+                    (change)="onEndDateChange($event)">
+            </div>
+
+            <div class="filter-group">
+                <label>Activity Type</label>
+                <select [value]="filters().type || ''" (change)="onTypeChange($event)">
+                    <option value="">All Types</option>
+                    <option *ngFor="let type of activityTypes" [value]="type">
+                        {{ getActivityTypeDisplayName(type) }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="filter-actions">
+                <button class="btn-secondary" (click)="applyFilters()">Apply Filters</button>
+                <button class="btn-outline" (click)="clearFilters()">Clear All</button>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="isLoading()" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading activities...</p>
+    </div>
+    @if (paginatedActivities().length === 0 && !isLoading()) {
+    <div class="empty-state">
+        <i class="fas fa-calendar-plus"></i>
+        <h3>No activities found</h3>
+        <p>No activities match your current filters</p>
+        <button class="btn-outline" (click)="clearFilters()">
+            Clear Filters
+        </button>
+    </div>
+    }
+    @if (!isLoading() ) {
+    <div class="activities-grid">
+        @for (activity of paginatedActivities(); track activity.id) {
+        <div class="activity-card" [class.upcoming]="isActivityUpcoming(activity)"
+            [class.in-progress]="isActivityInProgress(activity)" [class.past]="isActivityPast(activity)"
+            [class.selected]="selectedActivity()?.id === activity.id && showParticipantDetails()"
+            (click)="showActivityParticipants(activity, $event)">
+            <div class="activity-header">
+                <div class="activity-type-badge" [style.background]="getActivityTypeColor(activity.type)">
+                    {{ getActivityTypeDisplayName(activity.type) }}
+                </div>
+                <div class="activity-actions">
+                    <button class="btn-icon-sm" (click)="deleteActivity(activity)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="activity-content">
+                <h3 class="activity-title"
+                    [title]="(activity.title | titleTruncate:15).isTruncated ? activity.title : activity.title">
+                    {{ (activity.title | titleTruncate:15).displayText }}
+                </h3>
+
+                @if (activity.description) {
+                <p class="activity-description">{{ activity.description }}</p>
+                }
+
+                <div class="activity-time">
+                    <i class="fas fa-clock"></i>
+                    {{ formatActivityTime(activity.startTime, activity.endTime) }}
+                </div>
+
+                <div class="activity-date">
+                    <i class="fas fa-calendar"></i>
+                    {{ activity.startTime | date:'mediumDate' }}
+                </div>
+
+                <div class="activity-organizer">
+                    <i class="fas fa-user"></i>
+                    Organized by: {{ activity.organizerName }}
+                </div>
+
+
+            </div>
+
+            <div class="activity-status">
+                @if (isActivityInProgress(activity)) {
+                <span class="status-badge status-in-progress">
+                    <i class="fas fa-play-circle"></i> In Progress
+                </span>
+                } @else if (isActivityUpcoming(activity)) {
+                <span class="status-badge status-upcoming">
+                    <i class="fas fa-clock"></i> Upcoming
+                </span>
+                } @else {
+                <span class="status-badge status-completed">
+                    <i class="fas fa-check-circle"></i> Completed
+                </span>
+                }
+            </div>
+        </div>
+        }
+
+
+    </div>
+    }
+
+    @if (!isLoading() && filteredActivities().length > 0 && totalPages() > 1) {
+    <div class="pagination-container">
+        <div class="pagination-info">
+            Showing {{ displayRangeStart() }} - {{ displayRangeEnd() }}
+            of {{ filteredActivities().length }} activities
+        </div>
+
+        <div class="pagination-controls">
+            <button class="pagination-btn" (click)="prevPage()" [disabled]="currentPage() === 1">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+
+            @for (page of getPageNumbers(); track page) {
+            <button class="pagination-btn" [class.active]="currentPage() === page" (click)="goToPage(page)">
+                {{ page }}
+            </button>
+            }
+
+            <button class="pagination-btn" (click)="nextPage()" [disabled]="currentPage() === totalPages()">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <div class="items-per-page">
+            <label>Items per page:</label>
+            <select [value]="itemsPerPage()" (change)="onItemsPerPageChange($event)">
+                <option value="4">4</option>
+                <option value="8">8</option>
+                <option value="12">12</option>
+                <option value="24">24</option>
+            </select>
+        </div>
+    </div>
+    }
+    @if (showCreateModal()) {
+    <div class="modal-backdrop" (click)="closeCreateModal()">
+        <div class="modal" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Schedule New Activity</h3>
+                <button class="close-btn" (click)="closeCreateModal()">×</button>
+            </div>
+
+            <div class="modal-body">
+                <form (ngSubmit)="createActivity()">
+                    <div class="form-group">
+                        <label>Title *</label>
+                        <input type="text"  class="input-text" [(ngModel)]="newActivity().title" name="title" required
+                            placeholder="Meeting with team...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea [(ngModel)]="newActivity().description" name="description" rows="3"
+                            placeholder="Brief description of the activity..."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Start Time *</label>
+                            <input class="input-date" type="datetime-local" [(ngModel)]="newActivity().startTime" name="startTime"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>End Time *</label>
+                            <input  class="input-date" type="datetime-local" [(ngModel)]="newActivity().endTime" name="endTime" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Activity Type *</label>
+                        <select [(ngModel)]="newActivity().type" name="type" required>
+                            <option *ngFor="let type of activityTypes" [value]="type">
+                                {{ getActivityTypeDisplayName(type) }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Participants</label>
+                        <div class="participants-search">
+                            <div class="search-input-container">
+                                <i class="fas fa-search"></i>
+                                <input type="text" placeholder="Search users..." (input)="onUserSearchChange($event)">
+                            </div>
+                        </div>
+
+                        <div class="participants-list">
+                            @for (user of filteredUsers(); track user.id) {
+                            <div class="user-item" [class.selected]="isParticipantSelected(user.id!)"
+                                (click)="toggleParticipantSelection(user.id!)">
+                                <div class="user-select-indicator">
+                                    <div class="custom-checkbox" [class.checked]="isParticipantSelected(user.id!)">
+                                        @if (isParticipantSelected(user.id!)) {
+                                        <i class="fas fa-check"></i>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="user-avatar">
+                                    {{ getUserInitials(user.email!) }}
+                                </div>
+
+                                <div class="user-details">
+                                    <div class="user-email">{{ user.email }}</div>
+                                    <div class="user-name">{{ user.username || 'User' }}</div>
+                                </div>
+                            </div>
+                            }
+                        </div>
+
+                        @if (selectedParticipants().length > 0) {
+                        <div class="selected-participants">
+                            <strong>Selected Participants:</strong>
+                            <div class="selected-chips">
+                                @for (user of selectedParticipants(); track user.id) {
+                                <div class="user-chip">
+                                    <div class="chip-avatar">
+                                        {{ getUserInitials(user.email!) }}
+                                    </div>
+                                    <span class="chip-email">{{ user.email }}</span>
+                                    <button class="chip-remove"
+                                        (click)="toggleParticipantSelection(user.id!); $event.stopPropagation()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                }
+                            </div>
+                        </div>
+                        }
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" (click)="closeCreateModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Schedule Activity</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    }
+
+    @if (showParticipantDetails() && selectedActivity()) {
+    <div class="modal-backdrop participants-backdrop" (click)="hideParticipantDetails()">
+        <div class="participants-details-modal" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Participants - {{ selectedActivity()!.title }}</h3>
+                <button class="close-btn" (click)="hideParticipantDetails()">×</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="participants-list-details">
+                    @for (participant of selectedActivity()!.participantNames; track $index) {
+                    <div class="participant-item">
+                        <div class="participant-avatar-large">
+                            {{ getInitials(participant) }}
+                        </div>
+                        <div class="participant-info">
+                            <div class="participant-name">{{ participant }}</div>
+                            <div class="participant-role">Participant</div>
+                        </div>
+                    </div>
+                    }
+
+                    @if (selectedActivity()!.participantNames.length === 0) {
+                    <div class="empty-participants">
+                        <i class="fas fa-users"></i>
+                        <p>No participants for this activity</p>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+</div>

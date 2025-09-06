@@ -6,13 +6,14 @@ import { FormsModule } from '@angular/forms';
 import { ExtendedCardDTO } from '../../../core/models/extended-card';
 import { CommentDTO } from '../../../core/models/comment.model';
 import { UserDTO } from '../../../core/models/user/user-dto.model';
+import { TitleTruncatePipe } from '../../../core/pipes/title-truncate.pipe';
 
 @Component({
   selector: 'app-card',
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.scss'],
   standalone: true,
-  imports: [CommonModule, CdkDrag, FormsModule]
+  imports: [CommonModule, CdkDrag, FormsModule,TitleTruncatePipe]
 })
 export class CardComponent {
   @Input() card!: ExtendedCardDTO & { comments: CommentDTO[] };

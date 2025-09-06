@@ -12,8 +12,9 @@
   top: 0;
   left: 0;
   box-sizing: border-box;
-  position: relative;
+  position: fixed;
   overflow: hidden;
+  z-index: 1000;
 
   &.collapsed {
     width: 60px;
@@ -39,6 +40,7 @@
   padding: 24px 20px;
   border-bottom: 1px solid #3a3a4a;
   margin: 0;
+  flex-shrink: 0; 
 
   .logo {
     display: flex;
@@ -80,6 +82,7 @@
   padding: 24px 20px;
   border-bottom: 1px solid #3a3a4a;
   margin: 0;
+  flex-shrink: 0; 
 
   .avatar {
     width: 48px;
@@ -110,17 +113,36 @@
 
 .sidebar-nav {
   flex: 1;
-  padding: 20px 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  overflow: hidden; 
   margin: 0;
 }
 
-.nav-menu {
+.nav-menu:not(.bottom-menu) {
   list-style: none;
-  padding: 0;
+  padding: 20px 0;
   margin: 0;
+  overflow-y: auto; 
+  flex: 1; 
+  
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
 
   li {
     display: flex;
@@ -162,10 +184,55 @@
       }
     }
   }
+}
 
-  &.bottom-menu {
-    border-top: 1px solid #3a3a4a;
-    padding-top: 12px;
+.nav-menu.bottom-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-top: auto; 
+  border-top: 1px solid #3a3a4a;
+  flex-shrink: 0; 
+
+  li {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    margin: 4px 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    position: relative;
+
+    i {
+      width: 24px;
+      margin-right: 12px;
+      color: #adb5bd;
+    }
+
+    span {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    &:hover {
+      background: #3a3a4a;
+
+      i {
+        color: #f8f9fa;
+      }
+    }
+
+    &.active {
+      background: rgba(67, 97, 238, 0.1);
+
+      i,
+      span {
+        color: #caaafa;
+        font-weight: 600;
+      }
+    }
   }
 }
 
@@ -195,11 +262,10 @@
   }
 }
 
-
-
 @media (max-width: 768px) {
   .sidebar {
     width: 64px;
+    position: fixed;
 
     .logo span,
     .user-profile,
@@ -210,6 +276,17 @@
 
     .nav-menu {
       align-items: center;
+    }
+    
+    .nav-menu.bottom-menu {
+      li {
+        justify-content: center;
+        padding: 12px;
+        
+        i {
+          margin-right: 0;
+        }
+      }
     }
   }
 }

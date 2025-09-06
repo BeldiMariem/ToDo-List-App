@@ -23,6 +23,8 @@ export const routes: Routes = [
       { path: 'boards', loadComponent: () => import('../app/components/board/board-manegement/board-manegement.component').then(m => m.BoardManegementComponent) },
       { path: 'board-detail/:id', loadComponent: () => import('../app/components/board/board-detail/board-detail.component').then(m => m.BoardDetailComponent) },
       { path: 'profile', loadComponent: () => import('../app/components/user-profile/user-profile.component').then(m => m.UserProfileComponent) },
+      { path: 'activities', loadComponent: () => import('../app/components/activity/activities.component').then(m => m.ActivitiesComponent) },
+      { path: 'calendar', loadComponent: () => import('../app/components/calendar/calendar.component').then(m => m.CalendarComponent) },
 
     ]
   }
