@@ -20,6 +20,7 @@ import { UserService } from '../../../core/services/user.service';
 import { ListComponent } from '../list/list.component';
 import { moveItemInArray, transferArrayItem, CdkDragDrop, CdkDropListGroup, DragDropModule } from '@angular/cdk/drag-drop';
 import { FormsModule } from '@angular/forms';
+import { TitleTruncatePipe } from '../../../core/pipes/title-truncate.pipe';
 
 
 interface ListWithCards extends ListDTO {
@@ -38,7 +39,7 @@ interface BoardMemberWithDetails {
   templateUrl: './board-detail.component.html',
   styleUrls: ['./board-detail.component.scss'],
   standalone: true,
-  imports: [CommonModule, CdkDropListGroup, ListComponent, FormsModule, DragDropModule]
+  imports: [CommonModule, CdkDropListGroup, ListComponent, FormsModule, DragDropModule,TitleTruncatePipe]
 })
 export class BoardDetailComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
@@ -622,4 +623,47 @@ onUpdateList(event: { listId: number, name: string, color: string }) {
         });
     }
   }
+
+
+isMembersExpanded = false;
+maxVisibleMembers = 4;
+
+getVisibleMembers(): any[] {
+  if (this.isMembersExpanded || !this.boardMembersWithDetails) {
+    return this.boardMembersWithDetails || [];
+  }
+  return this.boardMembersWithDetails.slice(0, this.maxVisibleMembers);
+}
+
+hasHiddenMembers(): boolean {
+  if (!this.boardMembersWithDetails) return false;
+  return this.boardMembersWithDetails.length > this.maxVisibleMembers;
+}
+
+getHiddenMembersCount(): number {
+  if (!this.boardMembersWithDetails) return 0;
+  return this.boardMembersWithDetails.length - this.maxVisibleMembers;
+}
+
+toggleMemberExpansion(): void {
+  this.isMembersExpanded = !this.isMembersExpanded;
+}
+
+onMemberClick(member: any): void {
+  console.log('Member clicked:', member);
+}
+
+showAllMembersTooltip(event: MouseEvent): void {
+  if (this.isMembersExpanded) return;
+  
+  const hiddenMembers = this.boardMembersWithDetails.slice(this.maxVisibleMembers);
+  const tooltipText = hiddenMembers.map(m => m.email).join(', ');
+  
+  this.tooltipText = tooltipText;
+  this.tooltipPosition = {
+    x: event.clientX,
+    y: event.clientY - 40
+  };
+  this.isTooltipVisible = true;
+}
 }

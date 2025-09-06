@@ -2,19 +2,12 @@ import { Component, Output, EventEmitter, inject, Input, OnInit, OnDestroy } fro
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { UserDTO } from '../../core/models/user/user-dto.model';
 import { NotificationDTO } from '../../core/models/notification.model';
 
-interface ToastNotification {
-  id: number;
-  message: string;
-  type?: string;
-  time: Date;
-  icon: string;
-  visible: boolean;
-}
+
 
 @Component({
   selector: 'app-sidebar',
@@ -25,22 +18,18 @@ interface ToastNotification {
 export class SidebarComponent implements OnInit, OnDestroy {
   @Output() toggleSidebar = new EventEmitter<void>();
   @Input() isCollapsed = false;
-  @Output() menuItemSelected = new EventEmitter<string>(); // Emits string
-  @Output() toggleNotificationPanel = new EventEmitter<void>(); // Emits void
+  @Output() menuItemSelected = new EventEmitter<string>(); 
+  @Output() toggleNotificationPanel = new EventEmitter<void>(); 
 
   private authService = inject(AuthService);
   private notificationService = inject(NotificationService);
+  private router = inject(Router);
 
-  currentUser!:  UserDTO ;
+  currentUser!: UserDTO;
   userEmail = '';
   isAuthenticated = false;
 
-  dashboardActive = true;
-  boardsActive = false;
-  tasksActive = false;
-  calendarActive = false;
-  teamActive = false;
-  logoutActive = false;
+  activeItem: string = '';
 
   notifications: NotificationDTO[] = [];
   unreadCount = 0;
@@ -48,10 +37,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private notificationSubscription!: Subscription;
   private authCheckInterval: any;
   private unreadCountSubscription!: Subscription;
+  private routerSubscription!: Subscription;
 
-
-ngOnInit() {
-    
+  ngOnInit() {
     this.checkAuthState();
     
     this.authCheckInterval = setInterval(() => {
@@ -61,10 +49,33 @@ ngOnInit() {
     this.unreadCountSubscription = this.notificationService.unreadCount$
       .subscribe(count => {
         this.unreadCount = count;
-
       });
+
+    this.routerSubscription = this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.setActiveItemBasedOnRoute(event.url);
+      }
+    });
+
+    this.setActiveItemBasedOnRoute(this.router.url);
   }
- 
+
+  private setActiveItemBasedOnRoute(url: string): void {
+    if (url.includes('/boards')) {
+      this.activeItem = 'boards';
+    } else if (url.includes('/activities')) {
+      this.activeItem = 'activities';
+    } else if (url.includes('/profile')) {
+      this.activeItem = 'profile';
+    } else if (url.includes('/logout')) {
+      this.activeItem = 'logout';
+    } else if (url.includes('/calendar')) {
+      this.activeItem = 'calendar';
+    } else {
+      this.activeItem = 'boards';
+    }
+    
+  }
 
   private checkAuthState() {
     const isCurrentlyAuthenticated = this.authService.isAuthenticated();
@@ -92,15 +103,13 @@ ngOnInit() {
   }
 
   onMenuItemClick(menuItemId: string) {
+    this.activeItem = menuItemId;
     this.menuItemSelected.emit(menuItemId); 
   }
 
   onNotificationsClick() {
     this.toggleNotificationPanel.emit(); 
   }
-
-
-
 
   getNotificationIcon(type: string): string {
     const icons: Record<string, string> = {
@@ -126,6 +135,9 @@ ngOnInit() {
     }
     if (this.notificationSubscription) {
       this.notificationSubscription.unsubscribe();
+    }
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
     }
     this.notificationService.disconnect();
   }
