@@ -11,7 +11,11 @@
     <div class="list-title">
       <div class="color-badge" [style.backgroundColor]="list.color"></div>
       <div class="title-content">
-        <h3 [style.color]="getContrastColor(list.color)">{{ list.name }}</h3>
+        
+        <h3 [style.color]="getContrastColor(list.color)"
+          [title]="(list.name | titleTruncate:10).isTruncated ? list.name: list.name">
+          {{ (list.name | titleTruncate:10).displayText }}
+        </h3>
       </div>
     </div>
     <div class="list-actions">

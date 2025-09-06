@@ -20,8 +20,5 @@ export class WelcomeComponent {
     this.router.navigate(['/register']);
   }
 
-  openPrivacyPolicy(event: Event) {
-    event.preventDefault();
-    this.router.navigate(['/privacy']);
-  }
+
 }

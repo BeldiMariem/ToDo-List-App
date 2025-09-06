@@ -1,0 +1,83 @@
+<div class="calendar-container">
+  <header class="calendar-header">
+    <div class="header-main">
+      <h1>Calendar</h1>
+      <p class="header-subtitle">View your scheduled activities</p>
+    </div>
+
+    <div class="header-actions">
+      <div class="calendar-navigation">
+        <button class="btn-icon" (click)="previousMonth()">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <h2>{{ currentDate() | date:'MMMM yyyy' }}</h2>
+        <button class="btn-icon" (click)="nextMonth()">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        <button class="btn-outline" (click)="today()">
+          Today
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="calendar-content">
+    <div class="calendar-grid">
+      <!-- Weekday headers -->
+      <div class="calendar-weekdays">
+        <div class="weekday-header">Sun</div>
+        <div class="weekday-header">Mon</div>
+        <div class="weekday-header">Tue</div>
+        <div class="weekday-header">Wed</div>
+        <div class="weekday-header">Thu</div>
+        <div class="weekday-header">Fri</div>
+        <div class="weekday-header">Sat</div>
+      </div>
+
+      <!-- Calendar days -->
+      <div class="calendar-days">
+        @for (day of calendarDays(); track $index) {
+          <div class="calendar-day" 
+               [class.current-month]="day.isCurrentMonth"
+               [class.today]="day.isToday"
+               [class.selected]="selectedDate() && day.date.toDateString() === selectedDate()!.toDateString()"
+               (click)="selectDate(day.date)">
+            
+            <div class="day-number">{{ day.date.getDate() }}</div>
+            
+            <div class="day-activities">
+              @for (activity of day.activities.slice(0, 2); track activity.id) {
+                <div class="activity-dot" [style.background]="getActivityTypeColor(activity.type)"
+                     [title]="activity.title"></div>
+              }
+              @if (day.activities.length > 2) {
+                <div class="more-activities">+{{ day.activities.length - 2 }}</div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Selected date activities -->
+    @if (selectedDate()) {
+      <div class="selected-date-activities">
+        <h3>Activities for {{ selectedDate() | date:'fullDate' }}</h3>
+        
+        @for (activity of getActivitiesForDate(selectedDate()!); track activity.id) {
+          <div class="activity-item" [style.borderLeftColor]="getActivityTypeColor(activity.type)">
+            <div class="activity-time">
+              {{ activity.startTime | date:'shortTime' }} - {{ activity.endTime | date:'shortTime' }}
+            </div>
+            <div class="activity-title">{{ activity.title }}</div>
+            <div class="activity-type">{{ activity.type }}</div>
+          </div>
+        }
+        
+        @if (getActivitiesForDate(selectedDate()!).length === 0) {
+          <p class="no-activities">No activities scheduled for this date</p>
+        }
+      </div>
+    }
+  </div>
+</div>

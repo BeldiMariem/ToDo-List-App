@@ -11,10 +11,6 @@
           title="List View">
           <i class="fas fa-list"></i>
         </button>
-        <button class="view-btn" [class.active]="viewMode() === 'masonry'" (click)="viewMode.set('masonry')"
-          title="Masonry View">
-          <i class="fas fa-th"></i>
-        </button>
       </div>
       <button class="btn-primary" (click)="toggleCreateModal()">
         <i class="fas fa-plus"></i> Create New Board
@@ -34,15 +30,15 @@
     <button class="btn-retry" (click)="boardService.getBoards()">Try Again</button>
   </div>
   } @else if (boards().length > 0) {
-  <div class="board-content" [class.grid-view]="viewMode() === 'grid'" [class.list-view]="viewMode() === 'list'"
-    [class.masonry-view]="viewMode() === 'masonry'">
+  <div class="board-content" [class.grid-view]="viewMode() === 'grid'" [class.list-view]="viewMode() === 'list'">
 
     @for (board of boards(); track board.id) {
     <div class="board-card" [style.background]="getBoardGradient($index)" [class.list-card]="viewMode() === 'list'"
       (click)="openBoard(board.id)">
       <div class="card-content">
-        <h3>{{ board.name }}</h3>
-
+        <h3 [title]="(board.name | titleTruncate:20).isTruncated ? board.name: board.name">
+          {{ (board.name | titleTruncate:20).displayText }}
+        </h3>
         <div class="card-meta">
           <div class="card-actions">
             <button class="icon-btn" (click)="openBoard(board.id)" title="Open Board">

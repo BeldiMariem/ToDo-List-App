@@ -3,13 +3,14 @@ import { CdkDropList } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CardComponent } from '../card/card.component';
+import { TitleTruncatePipe } from '../../../core/pipes/title-truncate.pipe';
 
 @Component({
   selector: 'app-list',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss'],
   standalone: true,
-  imports: [CommonModule, CdkDropList, FormsModule, CardComponent]
+  imports: [CommonModule, CdkDropList, FormsModule, CardComponent, TitleTruncatePipe]
 })
 export class ListComponent {
   @Input() list!: any;

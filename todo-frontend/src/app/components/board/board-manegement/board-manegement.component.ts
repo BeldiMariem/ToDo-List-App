@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal, effect, ChangeDetectionStrategy } from '@angular/core';
 import { BoardService } from '../../../core/services/board.service';
 import { Router } from '@angular/router';
+import { TitleTruncatePipe } from '../../../core/pipes/title-truncate.pipe';
 
 @Component({
   selector: 'app-boards-page',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,TitleTruncatePipe],
   templateUrl: './board-manegement.component.html',
   styleUrls: ['./board-manegement.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -32,7 +33,6 @@ export class BoardManegementComponent implements OnInit {
   isCreating = signal(false);
 
   private colorGradients = [
-    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     'linear-gradient(135deg, #5e99e7ff 0%, #b490ca 100%)',
   ];
 
