@@ -5,6 +5,4 @@ export interface UserDTO {
   hasPassword?: boolean;
   resetToken?: string;
   tokenExpiryDate?:Date;
-
-
 }
