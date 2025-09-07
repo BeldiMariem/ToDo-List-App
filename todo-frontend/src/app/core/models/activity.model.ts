@@ -2,8 +2,8 @@ export interface Activity {
   id: number;
   title: string;
   description: string;
-  startTime: string; // ISO string format
-  endTime: string;   // ISO string format
+  startTime: string; 
+  endTime: string;   
   type: ActivityType;
   organizerId: number;
   organizerName: string;

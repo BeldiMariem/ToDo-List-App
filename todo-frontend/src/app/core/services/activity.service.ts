@@ -147,7 +147,7 @@ export class ActivityService {
                 return {
                   ...activity,
                   participantIds: [...activity.participantIds, userId],
-                  participantNames: [...activity.participantNames, 'Loading...'] // Placeholder
+                  participantNames: [...activity.participantNames, 'Loading...'] 
                 };
               }
               return activity;
