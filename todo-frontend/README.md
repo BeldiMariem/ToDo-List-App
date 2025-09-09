@@ -40,8 +40,8 @@ todo-frontend/
 │   │   ├── core/
 │   │   │   ├── services      # Angular services
 │   │   │   ├── models/       # TypeScript interfaces
-│   │   │   └── pipes/ 
-│   │   ├── layouts/
+│   │   │   └── pipes/        # Custom angular pipes  
+│   │   ├── layouts/          # Layout and shell components  
 │   │   ├── guards/           # Route guards
 │   │   ├── interceptors/     # HTTP interceptors
 │   │   └── utils/            # Utility functions
