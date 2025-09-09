@@ -1,0 +1,24 @@
+{
+  "validUser": {
+    "username": "testuser",
+    "email": "test@example.com",
+    "password": "TestPassword123"
+  },
+  "existingUser": {
+    "username": "existinguser",
+    "email": "existing@example.com",
+    "password": "ExistingPass123"
+  },
+  "invalidEmails": [
+    "invalid-email",
+    "missing@domain",
+    "@domain.com",
+    "test@.com"
+  ],
+  "weakPasswords": [
+    "short",
+    "lowercaseonly",
+    "UPPERCASEONLY",
+    "12345678"
+  ]
+}
