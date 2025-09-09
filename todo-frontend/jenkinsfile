@@ -32,6 +32,15 @@ pipeline {
             }
         }
 
+        stage('Test') {
+            steps {
+                dir("todo-frontend") {
+                    sh 'npm run test -- --watch=false --browsers=ChromeHeadless'
+                     sh 'npm run cypress:run'
+                }
+            }
+        }
+
         stage('Build Angular') {
             steps {
                 dir("todo-frontend") {
