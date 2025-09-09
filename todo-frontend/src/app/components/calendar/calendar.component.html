@@ -23,7 +23,6 @@
 
   <div class="calendar-content">
     <div class="calendar-grid">
-      <!-- Weekday headers -->
       <div class="calendar-weekdays">
         <div class="weekday-header">Sun</div>
         <div class="weekday-header">Mon</div>
@@ -34,7 +33,6 @@
         <div class="weekday-header">Sat</div>
       </div>
 
-      <!-- Calendar days -->
       <div class="calendar-days">
         @for (day of calendarDays(); track $index) {
           <div class="calendar-day" 
@@ -59,7 +57,6 @@
       </div>
     </div>
 
-    <!-- Selected date activities -->
     @if (selectedDate()) {
       <div class="selected-date-activities">
         <h3>Activities for {{ selectedDate() | date:'fullDate' }}</h3>
