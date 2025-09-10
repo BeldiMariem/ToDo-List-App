@@ -161,6 +161,8 @@ export class UserProfileComponent implements OnInit {
             this.userService.updateProfile(payload).subscribe({
                 next: (updatedUser: UserDTO) => {
                     this.authService.updateCurrentUser(updatedUser);
+                    localStorage.setItem("username",updatedUser.username);
+                    localStorage.setItem("email",updatedUser.email!)
 
                     this.isLoading.set(false);
                     this.showMessage('Profile updated successfully', 'success');

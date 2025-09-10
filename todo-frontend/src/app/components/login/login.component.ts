@@ -63,11 +63,7 @@ export class LoginComponent {
     this.isLoading = false;
     const token = this.authService.token();
     
-    if (token) {
-      this.router.navigate(['/boards']);
-    } else {
-      this.errorMessage = 'Invalid username or password';
-    }
+ 
   }
 
   clearError() {
