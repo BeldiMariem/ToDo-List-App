@@ -12,7 +12,8 @@ services:
       - todo_pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-
+    networks:
+      - todo-network
   backend:
     build:
       context: ./todo-backend
@@ -28,9 +29,24 @@ services:
       SPRING_PROFILES_ACTIVE: prod
     ports:
       - "8080:8080"
+    networks:
+      - todo-network
 
+  frontend:
+    build:
+      context: ./todo-frontend
+      dockerfile: Dockerfile
+    container_name: todo_frontend
+    depends_on:
+      - backend
+    ports:
+      - "4200:80"  
+    networks:
+      - todo-network
 
-
+networks:
+  todo-network:
+    driver: bridge
 
 volumes:
   todo_pgdata:

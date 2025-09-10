@@ -25,10 +25,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private notificationService = inject(NotificationService);
   private router = inject(Router);
 
-  currentUser!: UserDTO;
+currentUser!: any;
   userEmail = '';
   isAuthenticated = false;
-
+  username:any;
   activeItem: string = '';
 
   notifications: NotificationDTO[] = [];
@@ -38,14 +38,14 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private authCheckInterval: any;
   private unreadCountSubscription!: Subscription;
   private routerSubscription!: Subscription;
+  private authSubscription!: Subscription;
 
   ngOnInit() {
     this.checkAuthState();
+    const user = this.authService.currentUser();
+    this.username = localStorage.getItem("username");
+    this.userEmail = this.authService.getUserEmail();
     
-    this.authCheckInterval = setInterval(() => {
-      this.checkAuthState();
-    }, 1000);
-
     this.unreadCountSubscription = this.notificationService.unreadCount$
       .subscribe(count => {
         this.unreadCount = count;
@@ -130,6 +130,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+ 
     if (this.authCheckInterval) {
       clearInterval(this.authCheckInterval);
     }

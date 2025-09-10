@@ -14,7 +14,6 @@ export class AuthService {
   private router = inject(Router);
 
   private readonly STORAGE_KEY = 'auth_token';
-  private readonly USER_STORAGE_KEY = 'current_user';
   private _loginMethod = signal<'password' | 'google' | null>(null);
   readonly loginMethod = computed(() => this._loginMethod());
 
@@ -29,21 +28,6 @@ export class AuthService {
   readonly currentUser = computed(() => this._currentUser());
 
   constructor() {
-    const storedToken = localStorage.getItem(this.STORAGE_KEY);
-    const storedUser = localStorage.getItem(this.USER_STORAGE_KEY);
-
-    if (storedToken) {
-      this._state.update(s => ({ ...s, token: storedToken }));
-    }
-
-    if (storedUser) {
-      try {
-        this._currentUser.set(JSON.parse(storedUser));
-      } catch (e) {
-        console.error('Failed to parse stored user data', e);
-        localStorage.removeItem(this.USER_STORAGE_KEY);
-      }
-    }
 
     effect(() => {
       const token = this.token();
@@ -54,19 +38,12 @@ export class AuthService {
         }
       } else {
         localStorage.removeItem(this.STORAGE_KEY);
-        localStorage.removeItem(this.USER_STORAGE_KEY);
+        localStorage.removeItem("username");
+        localStorage.removeItem("email");
         this._currentUser.set(null);
       }
     });
 
-    effect(() => {
-      const user = this._currentUser();
-      if (user) {
-        localStorage.setItem(this.USER_STORAGE_KEY, JSON.stringify(user));
-      } else {
-        localStorage.removeItem(this.USER_STORAGE_KEY);
-      }
-    });
   }
 
   updateCurrentUser(updatedUser: Partial<UserDTO>): void {
@@ -86,6 +63,8 @@ export class AuthService {
           this._state.set({ token: res.token, loading: false, error: null });
           this._loginMethod.set('password');
           this.fetchCurrentUserFromToken();
+          localStorage.setItem("username",payload.username);
+
           this.router.navigateByUrl('/boards');
         },
         error: (err) => {
@@ -139,6 +118,8 @@ export class AuthService {
         .subscribe({
           next: (user) => {
             this._currentUser.set(user);
+            localStorage.setItem("email",user.email!);
+
           },
           error: (err) => {
             const msg = err?.error?.message || 'Failed to fetch user';
@@ -217,7 +198,9 @@ export class AuthService {
     this._loginMethod.set(null);
 
     localStorage.removeItem(this.STORAGE_KEY);
-    localStorage.removeItem(this.USER_STORAGE_KEY);
+    localStorage.removeItem("username");
+    localStorage.removeItem("email");
+    localStorage.removeItem("token");
 
     this.router.navigateByUrl('/login');
   }
