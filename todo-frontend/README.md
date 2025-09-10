@@ -1,18 +1,15 @@
 # 📝 ToDo List App - Frontend
-This is the frontend for a ToDo List application, built with **Angular** using standalone components, containerized with **Docker**, and deployed via **Jenkins CI/CD pipeline**.
+A modern, responsive ToDo List application built with Angular and its new standalone components. It features social login, real-time updates, containerized with **Docker**, and a robust CI/CD pipeline powered by **Jenkins**.
 
-## 📌 Key Features
-
-- Angular framework with standalone components architecture
-- Responsive UI with Angular Material components
-- Social login integration (Google)
-- Real-time updates using WebSocket (STOMP)
-- Calendar integration for task management
-- Unit tests and component tests with Karma/Jasmine
-- End-to-end (E2E) tests with Cypress
-- Docker containerization
-- Continuous Integration & Deployment using Jenkins
-- Linting and quality checks
+## 🌟 Key Features
+- **Modern Angular**: Built with Angular 20+ using standalone components and signals for a streamlined development experience.
+- **Responsive UI**: Clean and adaptive interface crafted with Angular Material.
+- **Secure Authentication**: Email/password login and Google OAuth integration using JWT.
+- **Real-Time notification**: Live task updates powered by WebSocket (STOMP) for a seamless user experience.
+- **Calendar Integration**: Visualize and manage tasks with an integrated calendar view.
+- **Comprehensive Testing**: Full test suite including unit, component, and end-to-end tests with Karma/Jasmine and Cypress.
+- **CI/CD Automation**: Fully automated build, test, and deployment pipeline via Jenkins.
+- **Containerized**: Easy deployment and scalability with Docker.
 
 ## ⚙️ Tech Stack
 
@@ -32,6 +29,7 @@ This is the frontend for a ToDo List application, built with **Angular** using s
 | Docker Hub     | Container registry for Docker images |
 
 ## 🏗️ Project Structure
+
 ```text
 todo-frontend/
 ├── src/
@@ -41,7 +39,7 @@ todo-frontend/
 │   │   │   ├── services      # Angular services
 │   │   │   ├── models/       # TypeScript interfaces
 │   │   │   └── pipes/        # Custom angular pipes  
-│   │   ├── layouts/          # Layout and shell components  
+│   │   ├── layouts/          # Main layout components  
 │   │   ├── guards/           # Route guards
 │   │   ├── interceptors/     # HTTP interceptors
 │   │   └── utils/            # Utility functions
@@ -50,6 +48,48 @@ todo-frontend/
 ├── Dockerfile               # Docker configuration
 ├── Jenkinsfile             # CI/CD pipeline
 └── package.json            # Dependencies and scripts
+```
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 20+
+- Angular CLI 20+
+- Docker (optional)
+- Jenkins (for CI/CD)
+
+## Installation
+
+**1. Clone the repository:**
+```bash
+git clone https://github.com/BeldiMariem/ToDo-List-App.git
+cd todo-frontend
+```
+**2. Install dependencies:**
+```bash
+npm install
+```
+**3. Configure environment:**
+Create src/environments/environment.ts and environment.prod.ts:
+```typescript
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:8080/api',
+  apiBaseUrl: 'http://localhost:8080'
+};
+```
+**4. Run the development server:**
+```bash
+ng serve
+```
+
+## 🐳 Docker Setup
+The application is containerized using Docker. To build and run:
+```bash
+# Build the image
+docker build -t todo-frontend .
+
+# Run the container
+docker run -p 4200:80 todo-frontend
 ```
 
 ## 🔄 Continuous Integration & Deployment
@@ -113,70 +153,6 @@ The frontend application is thoroughly tested to ensure reliability and maintain
 - Custom commands and type definitions created for maintainable tests
 - Comprehensive test coverage for user registration journey
 
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js 20+
-- Angular CLI 20+
-- Docker (optional)
-- Jenkins (for CI/CD)
-
-## Installation
-
-**1. Clone the repository:**
-```bash
-git clone https://github.com/BeldiMariem/ToDo-List-App.git
-cd todo-frontend
-```
-**2. Install dependencies:**
-```bash
-npm install
-```
-**3. Configure environment:**
-Create src/environments/environment.ts and environment.prod.ts:
-```typescript
-export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:8080/api',
-  apiBaseUrl: 'http://localhost:8080'
-};
-```
-**4. Run the development server:**
-```bash
-ng serve
-```
-
-## 🐳 Docker Setup
-The application is containerized using Docker. To build and run:
-```bash
-# Build the image
-docker build -t todo-frontend .
-
-# Run the container
-docker run -p 4200:80 todo-frontend
-```
-
-## 📦 Dependencies Overview
-### Main Dependencies:
-- @angular/core - Angular framework
-- @angular/router - Routing functionality
-- @angular/forms - Form handling
-- @angular/cdk - Angular component dev kit
-- @abacritt/angularx-social-login - Social authentication
-- @stomp/ng2-stompjs - WebSocket STOMP client
-- angular-calendar - Calendar component
-- rxjs - Reactive extensions
-- date-fns - Date utility library
-
-## 🔐 Authentication
-The frontend supports multiple authentication methods:
-- Email/password login
-- Google OAuth
-- JWT token management
-
-## 🔔 Real-time Features
-- Live updates using WebSocket connections
-- Instant notification system
 
 
 ###  👩‍💻 Developed with ❤️ by Mariem BELDI.

@@ -35,6 +35,7 @@
     "date-fns": "^4.1.0",
     "rxjs": "~7.8.0",
     "sockjs": "^0.3.24",
+    "sockjs-client": "^1.6.1",
     "stompjs": "^2.3.3",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
@@ -44,6 +45,7 @@
     "@angular/cli": "^20.1.4",
     "@angular/compiler-cli": "^20.1.0",
     "@types/jasmine": "~5.1.0",
+    "@types/sockjs-client": "^1.5.4",
     "@types/stompjs": "^2.3.9",
     "angular-eslint": "20.1.1",
     "cypress": "^15.1.0",
