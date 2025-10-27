@@ -1,9 +1,9 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, effect } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -20,7 +20,8 @@ export class RegisterComponent implements OnDestroy, OnInit {
 
   showSuccessMessage = false;
   passwordStrength: 'weak' | 'medium' | 'strong' = 'weak';
-  hasAttemptedSubmit = false; 
+  hasAttemptedSubmit = false;
+  registrationError = '';
 
   form = this.fb.nonNullable.group({
     username: ['', [
@@ -39,9 +40,15 @@ export class RegisterComponent implements OnDestroy, OnInit {
     ]]
   });
 
+  private errorEffect = effect(() => {
+    const error = this.auth.error();
+    if (error && this.hasAttemptedSubmit) {
+      this.registrationError = this.handleSpecificErrors(error);
+    }
+  });
+
   ngOnInit() {
     this.form.get('password')?.valueChanges
-      .pipe(takeUntil(this.destroy$))
       .subscribe(password => {
         this.calculatePasswordStrength(password || '');
       });
@@ -50,21 +57,22 @@ export class RegisterComponent implements OnDestroy, OnInit {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+    this.errorEffect.destroy();
   }
 
   get usernameInvalid(): boolean {
     const control = this.form.get('username');
-    return !!control && control.invalid && (control.dirty || control.touched);
+    return !!control && control.invalid && (control.dirty || control.touched || this.hasAttemptedSubmit);
   }
 
   get emailInvalid(): boolean {
     const control = this.form.get('email');
-    return !!control && control.invalid && (control.dirty || control.touched);
+    return !!control && control.invalid && (control.dirty || control.touched || this.hasAttemptedSubmit);
   }
 
   get passwordInvalid(): boolean {
     const control = this.form.get('password');
-    return !!control && control.invalid && (control.dirty || control.touched);
+    return !!control && control.invalid && (control.dirty || control.touched || this.hasAttemptedSubmit);
   }
 
   markAsTouched(controlName: string) {
@@ -85,20 +93,32 @@ export class RegisterComponent implements OnDestroy, OnInit {
   }
 
   onSubmit() {
-    this.hasAttemptedSubmit = true; 
+    this.hasAttemptedSubmit = true;
+    this.registrationError = '';
     this.form.markAllAsTouched();
 
     if (this.form.invalid) {
-      const firstErrorElement = document.querySelector('.error');
-      if (firstErrorElement) {
-        firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      this.scrollToFirstError();
       return;
     }
+
+    this.auth.handleAuthError('');
 
     this.auth.register(this.form.getRawValue());
   
     this.checkRegistrationStatus();
+  }
+
+  private scrollToFirstError() {
+    setTimeout(() => {
+      const firstErrorElement = document.querySelector('.error-message, .field-error');
+      if (firstErrorElement) {
+        firstErrorElement.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }
+    }, 100);
   }
 
   private checkRegistrationStatus() {
@@ -106,7 +126,10 @@ export class RegisterComponent implements OnDestroy, OnInit {
       if (!this.auth.loading()) {
         clearInterval(checkInterval);
         
-        if (!this.auth.error() && this.hasAttemptedSubmit) {
+        const error = this.auth.error();
+        if (error) {
+          console.log('Registration failed:', error);
+        } else if (this.hasAttemptedSubmit) {
           this.showSuccessMessage = true;
           setTimeout(() => {
             this.router.navigate(['/login']);
@@ -114,5 +137,26 @@ export class RegisterComponent implements OnDestroy, OnInit {
         }
       }
     }, 100);
+
+    setTimeout(() => {
+      clearInterval(checkInterval);
+      if (this.auth.loading()) {
+        this.registrationError = 'Registration timeout. Please try again.';
+      }
+    }, 10000); 
+  }
+
+  private handleSpecificErrors(error: string): string {
+      return 'Username or emailm already exists. Please choose a different username or email.';
+  }
+
+  clearError() {
+    this.registrationError = '';
+    this.auth.handleAuthError('');
+  }
+
+  hasError(controlName: string, errorType: string): boolean {
+    const control = this.form.get(controlName);
+    return !!(control?.hasError(errorType) && (control.dirty || control.touched || this.hasAttemptedSubmit));
   }
 }

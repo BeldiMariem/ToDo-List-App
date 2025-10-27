@@ -31,6 +31,8 @@ public class BoardMember {
     private Board board;
 
   private String role;
-  
+  public String toString() {
+    return "BoardMember{id=" + id + ", role=" + role + "}"; 
+}
   
 }

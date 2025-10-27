@@ -5,6 +5,9 @@ pipeline {
     }
     environment {
         DOCKER_IMAGE = "mariem19/todo_frontend"
+        AWS_ECR_IMAGE = "${env.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/todo-frontend"
+        CLUSTER_NAME = "todo-cluster"
+        SERVICE_NAME = "frontend-service"
     }
     stages {
         stage('Checkout') {
@@ -49,7 +52,7 @@ pipeline {
             }
         }
         
-        stage('Docker Build & Push') {
+        stage('Docker Build & Push to DockerHub') {
             when {
                 branch 'main'
             }
@@ -63,11 +66,53 @@ pipeline {
                 }
             }
         }
+    stage('Build & Push to AWS ECR') {
+            when {
+                branch 'main'
+            }
+            steps {
+                withAWS(credentials: 'aws-credentials', region: 'us-east-1') {
+                    sh """
+                        # Login to ECR
+                        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${env.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com
+                        
+                        # Build and tag for ECR
+                        docker build -t ${AWS_ECR_IMAGE}:latest ./todo-frontend
+                        docker push ${AWS_ECR_IMAGE}:latest
+                    """
+                }
+            }
+        }
+
+        stage('Deploy to ECS') {
+            when {
+                branch 'main'
+            }
+            steps {
+                withAWS(credentials: 'aws-credentials', region: 'us-east-1') {
+                    sh """
+                        # Force new deployment
+                        aws ecs update-service \
+                            --cluster ${CLUSTER_NAME} \
+                            --service ${SERVICE_NAME} \
+                            --force-new-deployment
+                        
+                        # Wait for deployment to stabilize
+                        echo "Waiting for deployment to complete..."
+                        aws ecs wait services-stable \
+                            --cluster ${CLUSTER_NAME} \
+                            --services ${SERVICE_NAME}
+                    """
+                }
+            }
+        }
     }
 
     post {
         success {
             echo '✅ Frontend pipeline completed successfully!'
+            echo '🌐 Frontend URL: http://todo-app-alb-911217416.us-east-1.elb.amazonaws.com'
+
         }
         failure {
             echo '❌ Frontend pipeline failed. Please check logs.'

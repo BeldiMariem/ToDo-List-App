@@ -10,6 +10,13 @@
       </div>
     }
 
+    @if (registrationError) {
+      <div class="error-message">
+        <i class="fas fa-exclamation-circle"></i>
+        {{ registrationError }}
+      </div>
+    }
+
     <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
       <div class="form-field">
         <label for="username">Username</label>
@@ -20,20 +27,25 @@
           placeholder="Enter your username"
           [class.error]="usernameInvalid"
           (blur)="markAsTouched('username')"
+          (input)="clearError()"
         />
 
-        @if (usernameInvalid) {
+        @if (hasError('username', 'required')) {
           <div class="field-error">
             <i class="fas fa-exclamation-triangle"></i>
-            @if (form.get('username')?.errors?.['required']) {
-              <span>Username is required</span>
-            }
-            @if (form.get('username')?.errors?.['minlength']) {
-              <span>Must be at least 3 characters</span>
-            }
-            @if (form.get('username')?.errors?.['pattern']) {
-              <span>Only letters, numbers, and underscores allowed</span>
-            }
+            <span>Username is required</span>
+          </div>
+        }
+        @if (hasError('username', 'minlength')) {
+          <div class="field-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Must be at least 3 characters</span>
+          </div>
+        }
+        @if (hasError('username', 'pattern')) {
+          <div class="field-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Only letters, numbers, and underscores allowed</span>
           </div>
         }
       </div>
@@ -47,17 +59,19 @@
           placeholder="Enter your email"
           [class.error]="emailInvalid"
           (blur)="markAsTouched('email')"
+          (input)="clearError()"
         />
 
-        @if (emailInvalid) {
+        @if (hasError('email', 'required')) {
           <div class="field-error">
             <i class="fas fa-exclamation-triangle"></i>
-            @if (form.get('email')?.errors?.['required']) {
-              <span>Email is required</span>
-            }
-            @if (form.get('email')?.errors?.['email']) {
-              <span>Please enter a valid email address</span>
-            }
+            <span>Email is required</span>
+          </div>
+        }
+        @if (hasError('email', 'email')) {
+          <div class="field-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Please enter a valid email address</span>
           </div>
         }
       </div>
@@ -71,24 +85,29 @@
           placeholder="Enter your password"
           [class.error]="passwordInvalid"
           (blur)="markAsTouched('password')"
+          (input)="clearError()"
         />
 
-        @if (passwordInvalid) {
+        @if (hasError('password', 'required')) {
           <div class="field-error">
             <i class="fas fa-exclamation-triangle"></i>
-            @if (form.get('password')?.errors?.['required']) {
-              <span>Password is required</span>
-            }
-            @if (form.get('password')?.errors?.['minlength']) {
-              <span>Must be at least 6 characters</span>
-            }
-            @if (form.get('password')?.errors?.['pattern']) {
-              <span>Must include uppercase, lowercase, and number</span>
-            }
+            <span>Password is required</span>
+          </div>
+        }
+        @if (hasError('password', 'minlength')) {
+          <div class="field-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Must be at least 6 characters</span>
+          </div>
+        }
+        @if (hasError('password', 'pattern')) {
+          <div class="field-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Must include uppercase, lowercase, and number</span>
           </div>
         }
 
-        @if (form.get('password')?.valid) {
+        @if (form.get('password')?.valid && form.get('password')?.value) {
           <div class="password-strength">
             <div
               class="strength-bar"
@@ -101,10 +120,15 @@
         }
       </div>
 
-      <button type="submit" class="register-button" [disabled]="auth.loading() || form.invalid">
-        {{ auth.loading() ? 'Creating Account…' : 'Create Account' }}
+      <button type="submit" class="register-button" [disabled]="auth.loading()">
         @if (auth.loading()) {
-          <span class="loading-spinner"></span>
+          <span>
+            <i class="fas fa-spinner fa-spin"></i>
+            Creating Account...
+          </span>
+        }
+        @if (!auth.loading()) {
+          <span>Create Account</span>
         }
       </button>
 
@@ -112,10 +136,6 @@
         Already have an account?
         <a routerLink="/login">Login</a>
       </div>
-
-      @if (auth.error()) {
-        <p class="error">{{ auth.error() }}</p>
-      }
     </form>
   </div>
 
