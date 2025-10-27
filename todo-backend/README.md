@@ -97,11 +97,6 @@ This lets GitHub send webhook events (pushes, PRs, etc.) to my local Jenkins as 
 
 I designed it this way to minimize manual steps, prevent mistakes, and ensure that the backend is always tested, packaged, and ready to run. Every commit is either verified in a test environment or fully deployed, depending on the branch. It’s all about **speed, reliability, and confidence** in the code.
 
-
-### 📸 Pipeline Screenshot
-
-![Jenkins Pipeline](/todo-backend/docs/jenkins-pipeline.png)
-
 ## ✅ Controller Tests
 
 All REST controllers are tested using standalone MockMvc setup with proper exception handling registration
