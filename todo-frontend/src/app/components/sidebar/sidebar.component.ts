@@ -4,8 +4,8 @@ import { NotificationService } from '../../core/services/notification.service';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { UserDTO } from '../../core/models/user/user-dto.model';
 import { NotificationDTO } from '../../core/models/notification.model';
+import { TitleTruncatePipe } from '../../core/pipes/title-truncate.pipe'; 
 
 
 
@@ -13,7 +13,7 @@ import { NotificationDTO } from '../../core/models/notification.model';
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
-  imports: [RouterLink, CommonModule]
+  imports: [RouterLink, CommonModule,TitleTruncatePipe]
 })
 export class SidebarComponent implements OnInit, OnDestroy {
   @Output() toggleSidebar = new EventEmitter<void>();

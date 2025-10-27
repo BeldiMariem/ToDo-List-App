@@ -12,7 +12,7 @@ export class CommentService {
   }
 
   createComment(payload: Partial<CommentDTO>) {
-    return this.http.post<CommentDTO>(`${environment.apiUrl}/comments`, payload);
+    return this.http.post<CommentDTO>(`${environment.apiUrl}/comments/createComment`, payload);
   }
 
   deleteComment(id: number) {

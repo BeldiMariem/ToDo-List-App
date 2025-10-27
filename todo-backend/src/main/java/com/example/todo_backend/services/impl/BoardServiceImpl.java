@@ -1,5 +1,6 @@
 package com.example.todo_backend.services.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,12 +40,38 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public BoardDTO createBoard(BoardDTO boardDto, Long userId) {
+        System.out.println("=== CREATE BOARD START ===");
+        System.out.println("BoardDTO: " + boardDto);
+        
         Board board = createNewBoard(boardDto);
+        System.out.println("Board created: " + board);
+        System.out.println("Board members: " + board.getMembers());
+        
         Board savedBoard = boardRepository.save(board);
-        
+        System.out.println("Board saved with ID: " + savedBoard.getId());
+        System.out.println("Saved board members: " + savedBoard.getMembers());
+    
         User creator = findUserById(userId);
-        addBoardMember(savedBoard, creator, ADMIN_ROLE);
+        System.out.println("User found: " + creator);
         
+        BoardMember member = new BoardMember();
+        member.setBoard(savedBoard);
+        member.setUser(creator);
+        member.setRole(getValidRole(ADMIN_ROLE));
+        System.out.println("BoardMember created: " + member);
+    
+        boardMemberRepository.save(member);
+        System.out.println("BoardMember saved");
+    
+        System.out.println("Before adding member - savedBoard.getMembers(): " + savedBoard.getMembers());
+        if (savedBoard.getMembers() == null) {
+            System.out.println("Members is NULL - initializing");
+            savedBoard.setMembers(new ArrayList<>());
+        }
+        savedBoard.getMembers().add(member);
+        System.out.println("After adding member: " + savedBoard.getMembers());
+    
+        System.out.println("=== CREATE BOARD END ===");
         return boardMapper.toSimpleDto(savedBoard);
     }
 
@@ -64,7 +91,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public void deleteBoard(Long boardId) {
-        Board board = findBoardById(boardId);        
+        Board board = findBoardById(boardId);
         notifyMembersAboutBoardDeletion(board);
         boardRepository.deleteById(boardId);
     }
@@ -77,17 +104,19 @@ public class BoardServiceImpl implements BoardService {
 
         updateBoardNameIfProvided(board, updateDto.getNewName());
         addNewMembersIfProvided(board, updateDto.getUserIds(), updateDto.getRole());
-        
+
         Board savedBoard = boardRepository.save(board);
-        
+
         notifyMembersAboutBoardUpdate(board, currentUser);
-        
+
         return boardMapper.toSimpleDto(savedBoard);
     }
 
     private Board createNewBoard(BoardDTO boardDto) {
         Board board = new Board();
         board.setName(boardDto.getName());
+        board.setMembers(new ArrayList<>());
+
         return board;
     }
 
@@ -101,18 +130,16 @@ public class BoardServiceImpl implements BoardService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
     }
 
- 
-
     private void notifyMembersAboutBoardDeletion(Board board) {
         User currentUser = findUserById(authService.getCurrentUserId());
-        String notificationMessage = String.format("%s deleted board: %s", 
-            currentUser.getUsername(), board.getName());
-        
+        String notificationMessage = String.format("%s deleted board: %s",
+                currentUser.getUsername(), board.getName());
+
         board.getMembers().stream()
-            .filter(member -> !isCurrentUser(member.getUser()))
-            .forEach(member -> 
-                notificationService.sendNotification(member.getUser(), notificationMessage)
-            );
+                .filter(member -> !isCurrentUser(member.getUser()))
+                .forEach(member
+                        -> notificationService.sendNotification(member.getUser(), notificationMessage)
+                );
     }
 
     private void updateBoardNameIfProvided(Board board, String newName) {
@@ -129,18 +156,18 @@ public class BoardServiceImpl implements BoardService {
         if (userIds == null || userIds.isEmpty()) {
             return;
         }
-        
+
         userIds.forEach(userId -> addOrUpdateBoardMember(board, userId, role));
     }
 
     private void addOrUpdateBoardMember(Board board, Long userId, String role) {
         User user = findUserById(userId);
-        
+
         findExistingMember(board, userId)
-            .ifPresentOrElse(
-                member -> updateMemberRole(member, role),
-                () -> addBoardMember(board, user, role)
-            );
+                .ifPresentOrElse(
+                        member -> updateMemberRole(member, role),
+                        () -> addBoardMember(board, user, role)
+                );
     }
 
     private java.util.Optional<BoardMember> findExistingMember(Board board, Long userId) {
@@ -160,9 +187,11 @@ public class BoardServiceImpl implements BoardService {
         member.setBoard(board);
         member.setUser(user);
         member.setRole(getValidRole(role));
-        
+
         boardMemberRepository.save(member);
-        board.getMembers().add(member);
+        List<BoardMember> updatedMembers = new ArrayList<>();
+        updatedMembers.add(member);
+        board.setMembers(updatedMembers);
     }
 
     private String getValidRole(String role) {
@@ -174,14 +203,14 @@ public class BoardServiceImpl implements BoardService {
     }
 
     private void notifyMembersAboutBoardUpdate(Board board, User updatingUser) {
-        String notificationMessage = String.format("%s added new users to board: %s", 
-            updatingUser.getUsername(), board.getName());
-        
+        String notificationMessage = String.format("%s added new users to board: %s",
+                updatingUser.getUsername(), board.getName());
+
         board.getMembers().stream()
-            .filter(member -> !isCurrentUser(member.getUser()))
-            .forEach(member -> 
-                notificationService.sendNotification(member.getUser(), notificationMessage)
-            );
+                .filter(member -> !isCurrentUser(member.getUser()))
+                .forEach(member
+                        -> notificationService.sendNotification(member.getUser(), notificationMessage)
+                );
     }
 
     private boolean isCurrentUser(User user) {
