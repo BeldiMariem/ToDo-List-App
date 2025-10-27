@@ -210,12 +210,5 @@ graph LR
 
 ### 👩‍💻 Developed with ❤️ by Mariem BELDI.
   
-
-### 🛠️ Technology Stack
-**Frontend**: Angular • TypeScript • RxJS • Signals 
-**Backend**: Spring Boot • Java 21 • JWT • WebSocket • PostgreSQL  
-**DevOps**: AWS ECS • Docker • Jenkins • Nexus • RDS  
-**Testing**: JUnit • MockMvc • Cypress • ESLint
-
 ---
 
