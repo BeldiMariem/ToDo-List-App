@@ -1,6 +1,9 @@
 package com.example.todo_backend.entities;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -26,8 +29,14 @@ public class Board {
   private String name;
 
   @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
-  private List<BoardMember> members;
+  @JsonIgnore
+  private List<BoardMember> members = new ArrayList<>();
 
   @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
-  private List<ListEntity> lists;
+  private List<ListEntity> lists = new ArrayList<>();
+
+  public String toString() {
+    return "Board{id=" + id + ", name='" + name + "'}"; 
+  }
+
 }

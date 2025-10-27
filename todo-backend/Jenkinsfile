@@ -7,8 +7,11 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE = 'mariem19/todo_backend'
-        APP_DIR = 'todo-backend'
+        DOCKER_IMAGE = "mariem19/todo_backend"
+        APP_DIR = "todo-backend"
+        AWS_ECR_IMAGE = "${env.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/todo-backend"
+        CLUSTER_NAME = "todo-cluster"
+        SERVICE_NAME = "backend-service"
     }
 
     options {
@@ -62,7 +65,7 @@ pipeline {
             }
         }
 
-        stage('Docker Build & Push') {
+        stage('Docker Build & Push to DockerHub') {
             when {
                 branch 'main'
             }
@@ -76,6 +79,53 @@ pipeline {
                 }
             }
         }
+        stage('Build & Push to AWS ECR') {
+            when {
+                branch 'main'
+            }
+            steps {
+                withAWS(credentials: 'aws-credentials', region: 'us-east-1') {
+                    sh """
+                        # Login to ECR
+                        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${env.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com
+                        
+                        # Build and tag for ECR
+                        docker build -t ${AWS_ECR_IMAGE}:latest ./${APP_DIR}
+                        docker push ${AWS_ECR_IMAGE}:latest
+                    """
+                }
+            }
+        }
+
+        stage('Deploy to ECS') {
+            when {
+                branch 'main'
+            }
+            steps {
+                withAWS(credentials: 'aws-credentials', region: 'us-east-1') {
+                    sh """
+                        # Force new deployment
+                        aws ecs update-service \
+                            --cluster ${CLUSTER_NAME} \
+                            --service ${SERVICE_NAME} \
+                            --force-new-deployment
+                        
+                        # Wait for deployment to stabilize
+                        echo "Waiting for deployment to complete..."
+                        aws ecs wait services-stable \
+                            --cluster ${CLUSTER_NAME} \
+                            --services ${SERVICE_NAME}
+                        
+                        # Check deployment status
+                        echo "Deployment status:"
+                        aws ecs describe-services \
+                            --cluster ${CLUSTER_NAME} \
+                            --services ${SERVICE_NAME} \
+                            --query 'services[0].{running:runningCount, desired:desiredCount}'
+                    """
+                }
+            }
+        }
     }
 
     post {
@@ -84,6 +134,8 @@ pipeline {
         }
         success {
             echo '✅ Backend build & deployment successful!'
+            echo '🔗 Backend API: http://todo-backend-alb-v2-1839963082.us-east-1.elb.amazonaws.com'
+
         }
         failure {
             echo '❌ Something went wrong with the backend pipeline.'

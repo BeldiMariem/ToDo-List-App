@@ -8,55 +8,57 @@
     </button>
   </div>
 
-
-    <div class="user-profile">
-      <div class="avatar">
-        <img src="https://static.vecteezy.com/system/resources/previews/022/450/297/non_2x/3d-minimal-purple-user-profile-avatar-icon-in-circle-white-frame-design-vector.jpg" alt="User Avatar">
-      </div>
-      <div class="user-info">
-        <h3>{{ username || userEmail }}</h3>
-      </div>
+  <div class="user-profile">
+    <div class="avatar">
+      <img
+        src="https://static.vecteezy.com/system/resources/previews/022/450/297/non_2x/3d-minimal-purple-user-profile-avatar-icon-in-circle-white-frame-design-vector.jpg"
+        alt="User Avatar">
     </div>
-  
+    <div class="user-info">
+      <h3 [title]="(userEmail | titleTruncate:15).isTruncated ? userEmail:userEmail">
+        {{ username || (userEmail | titleTruncate:15).displayText }}
+      </h3>
+    </div>
+  </div>
 
   <nav class="sidebar-nav">
     <ul class="nav-menu">
       <li [class.active]="activeItem === 'boards'" (click)="onMenuItemClick('boards')" routerLink="/boards">
         <i class="fas fa-list-check"></i>
-        <span >My Boards</span>
+        <span>My Boards</span>
       </li>
-      
+
       <li class="notification-item" (click)="onNotificationsClick()">
         <i class="fas fa-bell"></i>
         <span>Notifications</span>
         <div class="notification-badge-container">
           @if (unreadCount > 0) {
-            <span class="notification-badge">{{ unreadCount }}</span>
+          <span class="notification-badge">{{ unreadCount }}</span>
           }
         </div>
       </li>
-      
-      <li [class.active]="activeItem === 'activities'" (click)="onMenuItemClick('activities')"routerLink="/activities">
+
+      <li [class.active]="activeItem === 'activities'" (click)="onMenuItemClick('activities')" routerLink="/activities">
         <i class="fas fa-check-square"></i>
-        <span >Activities</span>
+        <span>Activities</span>
       </li>
 
       <li [class.active]="activeItem === 'calendar'" (click)="onMenuItemClick('calendar')" routerLink="/calendar">
         <i class="fas fa-calendar"></i>
-        <span >Calendar</span>
+        <span>Calendar</span>
       </li>
-      
-      
+
+
       <li [class.active]="activeItem === 'profile'" (click)="onMenuItemClick('profile')" routerLink="/profile">
         <i class="fas fa-cog"></i>
-        <span >Profile Settings</span>
+        <span>Profile Settings</span>
       </li>
     </ul>
 
     <ul class="nav-menu bottom-menu">
       <li [class.active]="activeItem === 'logout'" (click)="onMenuItemClick('logout')" routerLink="/logout">
         <i class="fas fa-arrow-left"></i>
-        <span >Logout</span>
+        <span>Logout</span>
       </li>
     </ul>
   </nav>

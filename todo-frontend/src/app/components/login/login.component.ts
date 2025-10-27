@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { LoginRequest } from '../../core/models/auth/login-request.model';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -22,6 +23,7 @@ export class LoginComponent {
   isLoading = false;
   showUsernameError = false;
   showPasswordError = false;
+  showPassword = false; 
 
   onSubmit() {
     this.clearErrors();
@@ -39,6 +41,7 @@ export class LoginComponent {
     }
 
     this.isLoading = true;
+    this.errorMessage = '';
 
     const payload: LoginRequest = {
       username: this.username,
@@ -48,22 +51,23 @@ export class LoginComponent {
     this.authService.login(payload);
     
     setTimeout(() => {
-      this.checkLoginStatus();
-    }, 100);
+      const error = this.authService.error();
+      if (error) {
+        this.errorMessage = 'Username or password incorrect';
+        this.isLoading = false;
+      }
+    }, 1000);
   }
 
-   signInWithGoogle() {
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+
+  signInWithGoogle() {
     this.isLoading = true;
     this.clearErrors();
     
-    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
-  }
-
-  private checkLoginStatus() {
-    this.isLoading = false;
-    const token = this.authService.token();
-    
- 
+    window.location.href = `${environment.apiBaseUrl}/oauth2/authorization/google`;
   }
 
   clearError() {
@@ -81,10 +85,5 @@ export class LoginComponent {
   forgotPassword(event: Event) {
     event.preventDefault();
     this.router.navigate(['/request-reset']);
-  }
-
-  goToRegister(event: Event) {
-    event.preventDefault();
-    this.router.navigate(['/register']);
   }
 }

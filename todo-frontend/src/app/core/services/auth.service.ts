@@ -79,20 +79,29 @@ export class AuthService {
     this.fetchCurrentUserFromToken();
   }
 
-  register(payload: RegisterRequest) {
-    this._state.update(s => ({ ...s, loading: true, error: null }));
-    this.http.post<UserDTO>(`${environment.apiUrl}/auth/register`, payload)
-      .subscribe({
-        next: () => {
-          this._state.update(s => ({ ...s, loading: false }));
-          this.router.navigateByUrl('/login');
-        },
-        error: (err) => {
-          const msg = err?.error?.message || 'Registration failed';
-          this._state.update(s => ({ ...s, loading: false, error: msg }));
+register(payload: RegisterRequest) {
+  this._state.update(s => ({ ...s, loading: true, error: null }));
+  this.http.post<UserDTO>(`${environment.apiUrl}/auth/register`, payload)
+    .subscribe({
+      next: (user) => {
+        this._state.update(s => ({ ...s, loading: false, error: null }));
+        this.router.navigateByUrl('/login');
+      },
+      error: (err) => {
+        let msg = 'Registration failed';
+        
+        if (err.status === 409) { 
+          msg = err.error?.message || 'User already exists with these credentials';
+        } else if (err.status === 400) { 
+          msg = err.error?.message || 'Invalid registration data';
+        } else if (err.error?.message) {
+          msg = err.error.message;
         }
-      });
-  }
+        
+        this._state.update(s => ({ ...s, loading: false, error: msg }));
+      }
+    });
+}
 
   getCurrentUser(): UserDTO {
     const currentUser = this._currentUser();
