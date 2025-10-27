@@ -140,6 +140,7 @@ npm install && ng serve
 
 ### Backend Automation
 ```mermaid
+graph LR
     A[📥 Code Commit] --> B[🛠️ Maven Build]
     B --> C[🧪 Unit Tests]
     C --> D[📦 Nexus Deployment]
