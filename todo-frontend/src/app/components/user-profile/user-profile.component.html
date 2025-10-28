@@ -13,6 +13,18 @@
     </div>
   }
 
+  @if (isDemoUser()) {
+    <div class="alert alert-info demo-alert">
+      <i class="fas fa-info-circle"></i>
+      <div class="demo-message">
+        <strong>Demo Account : </strong>
+        <span> This is a demo account for testing purposes. Profile editing, password changes, and account deletion are disabled. </span>
+        <br>
+        <span> Please create a new account to test all features.</span>
+      </div>
+    </div>
+  }
+
   <div class="profile-content">
     
     <div class="tabs">
@@ -21,12 +33,11 @@
         <i class="fas fa-user"></i> Profile
       </button>
       
-      @if (hasPassword()) {
         <button class="tab-btn" [class.active]="activeTab() === 'password'" 
                 (click)="selectTab('password')">
           <i class="fas fa-lock"></i> Password
         </button>
-      }
+      
       
       <button class="tab-btn" [class.active]="activeTab() === 'delete'" 
               (click)="selectTab('delete')">
@@ -55,7 +66,8 @@
             <div class="form-group">
               <label for="username">Username</label>
               <input type="text" id="username" formControlName="username" 
-                     [class.invalid]="profileForm.get('username')?.invalid && profileForm.get('username')?.touched">
+                     [class.invalid]="profileForm.get('username')?.invalid && profileForm.get('username')?.touched"
+                     [disabled]="isDemoUser()">
               
               @if (profileForm.get('username')?.invalid && profileForm.get('username')?.touched) {
                 <div class="error-message">
@@ -72,7 +84,8 @@
             <div class="form-group">
               <label for="email">Email Address</label>
               <input type="email" id="email" formControlName="email" 
-                     [class.invalid]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
+                     [class.invalid]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched"
+                     [disabled]="isDemoUser()">
               
               @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
                 <div class="error-message">
@@ -87,31 +100,50 @@
             </div>
 
             <button type="submit" class="btn-primary" 
-                    [disabled]="profileForm.invalid || isLoading()">
+                    [disabled]="profileForm.invalid || isLoading() || isDemoUser()">
               @if (isLoading()) {
                 <i class="fas fa-spinner fa-spin"></i>
               }
-              Update Profile
+              {{ isDemoUser() ? 'Editing Disabled' : 'Update Profile' }}
             </button>
+
+            @if (isDemoUser()) {
+              <div class="demo-note">
+                <i class="fas fa-info-circle"></i>
+                <span>This is a demo account. Profile editing is disabled. Please create a new account to test this feature.</span>
+              </div>
+            }
           </form>
         </div>
       }
 
-      @if (activeTab() === 'password' && hasPassword()) {
+      @if (activeTab() === 'password') {
         <div class="profile-card">
           <div class="card-header">
             <h3>Change Password</h3>
             <p>Update your password to keep your account secure</p>
           </div>
-
+          @if (!hasPassword()) {
+            <div class="warning-section">
+              <div class="warning-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+              </div>
+              <div class="warning-content">
+                <p>You cannot change password</p>
+              </div>
+            </div>
+          }
+       
+          @else {
           <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()">
             
             <div class="form-group">
               <label for="oldPassword">Current Password</label>
               <input type="password" id="oldPassword" formControlName="oldPassword" 
-                     [class.invalid]="passwordForm.get('oldPassword')?.invalid && passwordForm.get('oldPassword')?.touched">
+                     [class.invalid]="passwordForm.get('oldPassword')?.invalid && passwordForm.get('oldPassword')?.touched"
+                     [disabled]="isDemoUser()">
               
-              @if (passwordForm.get('oldPassword')?.invalid && passwordForm.get('oldPassword')?.touched) {
+              @if (passwordForm.get('oldPassword')?.invalid && passwordForm.get('oldPassword')?.touched && !isDemoUser()) {
                 <div class="error-message">
                   @if (passwordForm.get('oldPassword')?.errors?.['required']) {
                     <span>Current password is required</span>
@@ -126,9 +158,10 @@
             <div class="form-group">
               <label for="newPassword">New Password</label>
               <input type="password" id="newPassword" formControlName="newPassword" 
-                     [class.invalid]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched">
+                     [class.invalid]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched"
+                     [disabled]="isDemoUser()">
               
-              @if (passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched) {
+              @if (passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched && !isDemoUser()) {
                 <div class="error-message">
                   @if (passwordForm.get('newPassword')?.errors?.['required']) {
                     <span>New password is required</span>
@@ -143,9 +176,10 @@
             <div class="form-group">
               <label for="confirmPassword">Confirm New Password</label>
               <input type="password" id="confirmPassword" formControlName="confirmPassword" 
-                     [class.invalid]="(passwordForm.get('confirmPassword')?.invalid || passwordForm.errors?.['mismatch']) && passwordForm.get('confirmPassword')?.touched">
+                     [class.invalid]="(passwordForm.get('confirmPassword')?.invalid || passwordForm.errors?.['mismatch']) && passwordForm.get('confirmPassword')?.touched"
+                     [disabled]="isDemoUser()">
               
-              @if ((passwordForm.get('confirmPassword')?.invalid || passwordForm.errors?.['mismatch']) && passwordForm.get('confirmPassword')?.touched) {
+              @if ((passwordForm.get('confirmPassword')?.invalid || passwordForm.errors?.['mismatch']) && passwordForm.get('confirmPassword')?.touched && !isDemoUser()) {
                 <div class="error-message">
                   @if (passwordForm.get('confirmPassword')?.errors?.['required']) {
                     <span>Please confirm your password</span>
@@ -158,13 +192,20 @@
             </div>
 
             <button type="submit" class="btn-primary" 
-                    [disabled]="passwordForm.invalid || isLoading()">
+                    [disabled]="passwordForm.invalid || isLoading() || isDemoUser()">
               @if (isLoading()) {
                 <i class="fas fa-spinner fa-spin"></i>
               }
-              Change Password
+            Change Password
             </button>
+            @if (isDemoUser()) {
+              <div class="demo-note">
+                <i class="fas fa-info-circle"></i>
+                <span>This is a demo account. Profile editing is disabled. Please create a new account to test this feature.</span>
+              </div>
+            }
           </form>
+        }
         </div>
       }
 
@@ -175,6 +216,7 @@
             <p>Permanently delete your account and all associated data</p>
           </div>
 
+         
           <div class="warning-section">
             <div class="warning-icon">
               <i class="fas fa-exclamation-triangle"></i>
@@ -184,28 +226,37 @@
               <p>This action cannot be undone. All your data will be permanently removed from our systems.</p>
             </div>
           </div>
-         @if (  hasPassword()) {
-          <form [formGroup]="deleteForm" (ngSubmit)="showDeleteModal.set(true)">
-            <div class="form-group">
-              <label for="deletePassword">Enter your password to confirm</label>
-              <input type="password" id="deletePassword" formControlName="password" 
-                     [class.invalid]="deleteForm.get('password')?.invalid && deleteForm.get('password')?.touched">
-              
-              @if (deleteForm.get('password')?.invalid && deleteForm.get('password')?.touched) {
-                <div class="error-message">
-                  Password is required to confirm account deletion
+
+          @if (!isDemoUser()) {
+            @if (hasPassword()) {
+              <form [formGroup]="deleteForm" (ngSubmit)="showDeleteModal.set(true)">
+                <div class="form-group">
+                  <label for="deletePassword">Enter your password to confirm</label>
+                  <input type="password" id="deletePassword" formControlName="password" 
+                         [class.invalid]="deleteForm.get('password')?.invalid && deleteForm.get('password')?.touched">
+                  
+                  @if (deleteForm.get('password')?.invalid && deleteForm.get('password')?.touched) {
+                    <div class="error-message">
+                      Password is required to confirm account deletion
+                    </div>
+                  }
                 </div>
-              }
-            </div>
-           
-            <button type="submit" class="btn-danger" [disabled]="deleteForm.invalid">
-              Delete Account
-            </button>
-          </form>
-          } @else {
-            <button  class="btn-danger" (click)="showDeleteGoogleModal.set(true)">
-              Delete Account
-            </button>
+               
+                <button type="submit" class="btn-danger" [disabled]="deleteForm.invalid">
+                  Delete Account
+                </button>
+                @if (isDemoUser()) {
+                  <div class="demo-note">
+                    <i class="fas fa-info-circle"></i>
+                    <span>This is a demo account. Profile editing is disabled. Please create a new account to test this feature.</span>
+                  </div>
+                }
+              </form>
+            } @else {
+              <button class="btn-danger" (click)="showDeleteGoogleModal.set(true)">
+                Delete Account
+              </button>
+            }
           }
         </div>
       }

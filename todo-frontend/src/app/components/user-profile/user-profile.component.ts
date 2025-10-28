@@ -36,6 +36,11 @@ export class UserProfileComponent implements OnInit {
     hasPassword = computed(() => {
       return this.authService.hasPasswordLogin();
     });
+    
+    isDemoUser = computed(() => {
+      const user = this.currentUser();
+      return user?.username === 'mariemBeldi';
+    });
 
     ngOnInit(): void {
         this.initializeForms();
@@ -45,30 +50,54 @@ export class UserProfileComponent implements OnInit {
         const user = this.currentUser();
 
         this.profileForm = this.fb.group({
-            username: [user?.username || '', [Validators.required, Validators.minLength(3)]],
-            email: [user?.email || '', [Validators.required, Validators.email]]
+            username: [
+                { value: user?.username || '', disabled: this.isDemoUser() }, 
+                [Validators.required, Validators.minLength(3)]
+            ],
+            email: [
+                { value: user?.email || '', disabled: this.isDemoUser() }, 
+                [Validators.required, Validators.email]
+            ]
         });
 
         if (this.hasPassword()) {
             this.passwordForm = this.fb.group({
-                oldPassword: ['', [Validators.required, Validators.minLength(6)]],
-                newPassword: ['', [Validators.required, Validators.minLength(6)]],
-                confirmPassword: ['', [Validators.required]]
-            }, { validator: this.passwordMatchValidator });
+                oldPassword: [
+                    { value: '', disabled: this.isDemoUser() }, 
+                    this.isDemoUser() ? [] : [Validators.required, Validators.minLength(6)]
+                ],
+                newPassword: [
+                    { value: '', disabled: this.isDemoUser() }, 
+                    this.isDemoUser() ? [] : [Validators.required, Validators.minLength(6)]
+                ],
+                confirmPassword: [
+                    { value: '', disabled: this.isDemoUser() }, 
+                    this.isDemoUser() ? [] : [Validators.required]
+                ]
+            }, { validator: this.isDemoUser() ? null : this.passwordMatchValidator });
         }
 
-        this.deleteForm = this.fb.group({
-            password: ['', [Validators.required]]
-        });
+        if (!this.isDemoUser()) {
+            this.deleteForm = this.fb.group({
+                password: ['', [Validators.required]]
+            });
+        }
     }
 
     private passwordMatchValidator(form: FormGroup) {
+        if (this.isDemoUser()) return null;
+        
         const newPassword = form.get('newPassword')?.value;
         const confirmPassword = form.get('confirmPassword')?.value;
         return newPassword === confirmPassword ? null : { mismatch: true };
     }
 
     onChangePassword(): void {
+        if (this.isDemoUser()) {
+            this.showMessage('Demo account password cannot be modified. Please create a new account to test this feature.', 'error');
+            return;
+        }
+
         if (this.passwordForm.valid) {
             this.isLoading.set(true);
 
@@ -93,7 +122,12 @@ export class UserProfileComponent implements OnInit {
     }
 
     onDeleteAccount(): void {
-        if (this.deleteForm.valid) {
+        if (this.isDemoUser()) {
+            this.showMessage('Demo account cannot be deleted. Please create a new account to test deletion.', 'error');
+            return;
+        }
+
+        if (this.hasPassword() && this.deleteForm.valid) {
             this.isLoading.set(true);
 
             const payload: UserDeleteRequestDTO = {
@@ -114,14 +148,12 @@ export class UserProfileComponent implements OnInit {
                     console.error('Account deletion error:', error);
                 }
             });
-        }
-        else{
-        this.showDeleteGoogleModal.set(true);
-
+        } else if (!this.hasPassword()) {
+            this.isLoading.set(true);
             this.userService.deleteGoogleUser().subscribe({
                 next: () => {
                     this.isLoading.set(false);
-                    this.showDeleteModal.set(false);
+                    this.showDeleteGoogleModal.set(false);
                     this.showMessage('Account deleted successfully', 'success');
                     this.authService.logout();
                     this.router.navigate(['/login']);
@@ -132,7 +164,6 @@ export class UserProfileComponent implements OnInit {
                     console.error('Account deletion error:', error);
                 }
             });
-
         }
     }
 
@@ -150,26 +181,33 @@ export class UserProfileComponent implements OnInit {
     }
 
     onUpdateProfile(): void {
+        if (this.isDemoUser()) {
+            this.showMessage('Demo account cannot be modified. Please create a new account to test profile updates.', 'error');
+            return;
+        }
+    
         if (this.profileForm.valid) {
             this.isLoading.set(true);
-
+    
             const payload = {
                 username: this.profileForm.value.username,
                 email: this.profileForm.value.email
             };
-
+    
             this.userService.updateProfile(payload).subscribe({
                 next: (updatedUser: UserDTO) => {
                     this.authService.updateCurrentUser(updatedUser);
-                    localStorage.setItem("username",updatedUser.username);
-                    localStorage.setItem("email",updatedUser.email!)
-
+                    localStorage.setItem("username", updatedUser.username);
+                    localStorage.setItem("email", updatedUser.email!)
+    
                     this.isLoading.set(false);
                     this.showMessage('Profile updated successfully', 'success');
                 },
                 error: (error) => {
                     this.isLoading.set(false);
-                    this.showMessage('Failed to update profile', 'error');
+                    
+                    const errorMessage = error.message || 'Failed to update profile';
+                    this.showMessage(errorMessage, 'error');
                     console.error('Profile update error:', error);
                 }
             });
