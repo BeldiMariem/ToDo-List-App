@@ -1,6 +1,7 @@
 package com.example.todo_backend.services.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO updateProfile(Long userId, UserUpdateDTO dto) {
         User user = findUserById(userId);
-
+    
+        if (!user.getUsername().equals(dto.getUsername())) {
+            Optional<User> existingUserByUsername = userRepository.findByUsername(dto.getUsername());
+            if (existingUserByUsername.isPresent() && !existingUserByUsername.get().getId().equals(userId)) {
+                throw new RuntimeException("Username already exists: " + dto.getUsername());
+            }
+        }
+        
+        if (!user.getEmail().equals(dto.getEmail())) {
+            Optional<User> existingUserByEmail = userRepository.findByEmail(dto.getEmail());
+            if (existingUserByEmail.isPresent() && !existingUserByEmail.get().getId().equals(userId)) {
+                throw new RuntimeException("Email already exists: " + dto.getEmail());
+            }
+        }
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
 

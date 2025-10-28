@@ -4,6 +4,7 @@ import { environment } from '../../../environments/environment';
 import { UserDTO } from '../models/user/user-dto.model';
 import { PasswordUpdateDTO } from '../models/password-update.model';
 import { UserDeleteRequestDTO } from '../models/user-delete-request.model';
+import { catchError, throwError } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -17,7 +18,13 @@ export class UserService {
     return this.http.get<UserDTO[]>(`${environment.apiUrl}/users/getUserById/${userId}`);
   }
   updateProfile(payload: Partial<UserDTO>) {
-      return this.http.put<UserDTO>(`${environment.apiUrl}/users/updateProfile`, payload);
+    return this.http.put<UserDTO>(`${environment.apiUrl}/users/updateProfile`, payload)
+      .pipe(
+        catchError((error) => {
+          const errorMessage = 'Username or email already exists. Please choose different values.';
+          return throwError(() => new Error(errorMessage));
+        })
+      );
   }
   updatePassword(payload: Partial<PasswordUpdateDTO>) {
       return this.http.put<UserDTO>(`${environment.apiUrl}/users/updatePassword`, payload);

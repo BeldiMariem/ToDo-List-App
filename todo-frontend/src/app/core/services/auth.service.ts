@@ -30,7 +30,6 @@ export class AuthService {
   readonly currentUser = computed(() => this._currentUser());
 
   constructor() {
-    // Load stored authentication state on service initialization
     this.loadStoredAuth();
 
     effect(() => {
@@ -60,26 +59,21 @@ export class AuthService {
     const loginMethod = localStorage.getItem(this.LOGIN_METHOD_KEY) as 'password' | 'google' | null;
 
     if (token) {
-      // Set the token first
       this._state.update(s => ({ ...s, token }));
       
-      // Set login method if exists
       if (loginMethod) {
         this._loginMethod.set(loginMethod);
       }
       
-      // Load user data if exists
       if (user) {
         try {
           const userData = JSON.parse(user);
           this._currentUser.set(userData);
         } catch (error) {
           console.error('Failed to parse stored user data', error);
-          // If user data is corrupted, fetch from server using token
           this.fetchCurrentUserFromToken();
         }
       } else {
-        // No user data stored, fetch from server
         this.fetchCurrentUserFromToken();
       }
     }
@@ -98,7 +92,6 @@ export class AuthService {
     if (currentUser) {
       const mergedUser = { ...currentUser, ...updatedUser };
       this._currentUser.set(mergedUser);
-      // Update localStorage as well
       localStorage.setItem(this.USER_KEY, JSON.stringify(mergedUser));
     }
   }
@@ -177,7 +170,6 @@ export class AuthService {
           next: (user) => {
             this._currentUser.set(user);
             localStorage.setItem("email", user.email!);
-            // Also store the full user object
             localStorage.setItem(this.USER_KEY, JSON.stringify(user));
           },
           error: (err) => {
@@ -215,7 +207,6 @@ export class AuthService {
       return currentUser.email;
     }
     
-    // Fallback to token if user data not loaded yet
     const token = this.token();
     if (!token) return '';
 
@@ -234,7 +225,6 @@ export class AuthService {
       return currentUser.username;
     }
     
-    // Fallback to token if user data not loaded yet
     const token = this.token();
     if (!token) return '';
 
@@ -278,7 +268,6 @@ export class AuthService {
     sessionStorage.clear();
   }
   
-  // Helper method to check if token is valid (not expired)
   isTokenValid(): boolean {
     const token = this.token();
     if (!token) return false;

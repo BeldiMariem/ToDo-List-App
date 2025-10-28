@@ -64,7 +64,28 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   overflow: hidden;
 }
+.alert-info {
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
+}
 
+.demo-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-top: 16px;
+  color: #64748b;
+  font-size: 14px;
+  
+  i {
+    color: #3b82f6;
+  }
+}
 .tabs {
   display: flex;
   background: #f8fafc;
@@ -244,7 +265,7 @@
   }
   
   input {
-    width: 100%;
+    width: 90%;
     padding: 14px;
     border: 1px solid #d1d5db;
     border-radius: 10px;
