@@ -13,10 +13,12 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
 
-  private readonly STORAGE_KEY = 'auth_token';
+  private readonly TOKEN_KEY = 'auth_token';
+  private readonly USER_KEY = 'current_user';
+  private readonly LOGIN_METHOD_KEY = 'login_method';
+  
   private _loginMethod = signal<'password' | 'google' | null>(null);
   readonly loginMethod = computed(() => this._loginMethod());
-
 
   private _state = signal<AuthState>({ token: null, loading: false, error: null });
   private _currentUser = signal<UserDTO | null>(null);
@@ -28,22 +30,67 @@ export class AuthService {
   readonly currentUser = computed(() => this._currentUser());
 
   constructor() {
+    // Load stored authentication state on service initialization
+    this.loadStoredAuth();
 
     effect(() => {
       const token = this.token();
+      const currentUser = this.currentUser();
+      const loginMethod = this.loginMethod();
+      
       if (token) {
-        localStorage.setItem(this.STORAGE_KEY, token);
-        if (!this._currentUser()) {
+        localStorage.setItem(this.TOKEN_KEY, token);
+        
+        if (currentUser) {
+          localStorage.setItem(this.USER_KEY, JSON.stringify(currentUser));
+        }
+        
+        if (loginMethod) {
+          localStorage.setItem(this.LOGIN_METHOD_KEY, loginMethod);
+        }
+      } else {
+        this.clearStoredAuth();
+      }
+    });
+  }
+
+  private loadStoredAuth(): void {
+    const token = localStorage.getItem(this.TOKEN_KEY);
+    const user = localStorage.getItem(this.USER_KEY);
+    const loginMethod = localStorage.getItem(this.LOGIN_METHOD_KEY) as 'password' | 'google' | null;
+
+    if (token) {
+      // Set the token first
+      this._state.update(s => ({ ...s, token }));
+      
+      // Set login method if exists
+      if (loginMethod) {
+        this._loginMethod.set(loginMethod);
+      }
+      
+      // Load user data if exists
+      if (user) {
+        try {
+          const userData = JSON.parse(user);
+          this._currentUser.set(userData);
+        } catch (error) {
+          console.error('Failed to parse stored user data', error);
+          // If user data is corrupted, fetch from server using token
           this.fetchCurrentUserFromToken();
         }
       } else {
-        localStorage.removeItem(this.STORAGE_KEY);
-        localStorage.removeItem("username");
-        localStorage.removeItem("email");
-        this._currentUser.set(null);
+        // No user data stored, fetch from server
+        this.fetchCurrentUserFromToken();
       }
-    });
+    }
+  }
 
+  private clearStoredAuth(): void {
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.USER_KEY);
+    localStorage.removeItem(this.LOGIN_METHOD_KEY);
+    localStorage.removeItem("username");
+    localStorage.removeItem("email");
   }
 
   updateCurrentUser(updatedUser: Partial<UserDTO>): void {
@@ -51,6 +98,8 @@ export class AuthService {
     if (currentUser) {
       const mergedUser = { ...currentUser, ...updatedUser };
       this._currentUser.set(mergedUser);
+      // Update localStorage as well
+      localStorage.setItem(this.USER_KEY, JSON.stringify(mergedUser));
     }
   }
 
@@ -62,9 +111,8 @@ export class AuthService {
         next: (res) => {
           this._state.set({ token: res.token, loading: false, error: null });
           this._loginMethod.set('password');
+          localStorage.setItem("username", payload.username);
           this.fetchCurrentUserFromToken();
-          localStorage.setItem("username",payload.username);
-
           this.router.navigateByUrl('/boards');
         },
         error: (err) => {
@@ -73,35 +121,36 @@ export class AuthService {
         }
       });
   }
+
   handleOAuthToken(token: string) {
     this._state.set({ token: token, loading: false, error: null });
     this._loginMethod.set('google');
     this.fetchCurrentUserFromToken();
   }
 
-register(payload: RegisterRequest) {
-  this._state.update(s => ({ ...s, loading: true, error: null }));
-  this.http.post<UserDTO>(`${environment.apiUrl}/auth/register`, payload)
-    .subscribe({
-      next: (user) => {
-        this._state.update(s => ({ ...s, loading: false, error: null }));
-        this.router.navigateByUrl('/login');
-      },
-      error: (err) => {
-        let msg = 'Registration failed';
-        
-        if (err.status === 409) { 
-          msg = err.error?.message || 'User already exists with these credentials';
-        } else if (err.status === 400) { 
-          msg = err.error?.message || 'Invalid registration data';
-        } else if (err.error?.message) {
-          msg = err.error.message;
+  register(payload: RegisterRequest) {
+    this._state.update(s => ({ ...s, loading: true, error: null }));
+    this.http.post<UserDTO>(`${environment.apiUrl}/auth/register`, payload)
+      .subscribe({
+        next: (user) => {
+          this._state.update(s => ({ ...s, loading: false, error: null }));
+          this.router.navigateByUrl('/login');
+        },
+        error: (err) => {
+          let msg = 'Registration failed';
+          
+          if (err.status === 409) { 
+            msg = err.error?.message || 'User already exists with these credentials';
+          } else if (err.status === 400) { 
+            msg = err.error?.message || 'Invalid registration data';
+          } else if (err.error?.message) {
+            msg = err.error.message;
+          }
+          
+          this._state.update(s => ({ ...s, loading: false, error: msg }));
         }
-        
-        this._state.update(s => ({ ...s, loading: false, error: msg }));
-      }
-    });
-}
+      });
+  }
 
   getCurrentUser(): UserDTO {
     const currentUser = this._currentUser();
@@ -127,8 +176,9 @@ register(payload: RegisterRequest) {
         .subscribe({
           next: (user) => {
             this._currentUser.set(user);
-            localStorage.setItem("email",user.email!);
-
+            localStorage.setItem("email", user.email!);
+            // Also store the full user object
+            localStorage.setItem(this.USER_KEY, JSON.stringify(user));
           },
           error: (err) => {
             const msg = err?.error?.message || 'Failed to fetch user';
@@ -139,8 +189,6 @@ register(payload: RegisterRequest) {
       console.error('Failed to decode JWT token', e);
     }
   }
-
-
 
   handleAuthError(errorMessage: string) {
     this._state.update(s => ({ ...s, loading: false, error: errorMessage }));
@@ -162,6 +210,12 @@ register(payload: RegisterRequest) {
   }
 
   getUserEmail(): string {
+    const currentUser = this._currentUser();
+    if (currentUser?.email) {
+      return currentUser.email;
+    }
+    
+    // Fallback to token if user data not loaded yet
     const token = this.token();
     if (!token) return '';
 
@@ -175,6 +229,12 @@ register(payload: RegisterRequest) {
   }
 
   getUserName(): string {
+    const currentUser = this._currentUser();
+    if (currentUser?.username) {
+      return currentUser.username;
+    }
+    
+    // Fallback to token if user data not loaded yet
     const token = this.token();
     if (!token) return '';
 
@@ -182,10 +242,11 @@ register(payload: RegisterRequest) {
       const payload = this.decodeJwt(token);
       return payload.username || '';
     } catch (e) {
-      console.error('Failed to get email from token', e);
+      console.error('Failed to get username from token', e);
       return '';
     }
   }
+
   forgotPassword(email: string) {
     return this.http.post(`${environment.apiUrl}/auth/forgot-password?email=${email}`, null, {
       responseType: 'text'
@@ -200,17 +261,11 @@ register(payload: RegisterRequest) {
     );
   }
 
-
   logout() {
     this._state.set({ token: null, loading: false, error: null });
     this._currentUser.set(null);
     this._loginMethod.set(null);
-
-    localStorage.removeItem(this.STORAGE_KEY);
-    localStorage.removeItem("username");
-    localStorage.removeItem("email");
-    localStorage.removeItem("token");
-
+    this.clearStoredAuth();
     this.router.navigateByUrl('/login');
   }
 
@@ -223,4 +278,17 @@ register(payload: RegisterRequest) {
     sessionStorage.clear();
   }
   
+  // Helper method to check if token is valid (not expired)
+  isTokenValid(): boolean {
+    const token = this.token();
+    if (!token) return false;
+
+    try {
+      const payload = this.decodeJwt(token);
+      const currentTime = Math.floor(Date.now() / 1000);
+      return payload.exp > currentTime;
+    } catch (e) {
+      return false;
+    }
+  }
 }

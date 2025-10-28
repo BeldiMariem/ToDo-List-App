@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -23,7 +23,27 @@ export class LoginComponent {
   isLoading = false;
   showUsernameError = false;
   showPasswordError = false;
-  showPassword = false; 
+  showPassword = false;
+
+  constructor() {
+    effect(() => {
+      const loading = this.authService.loading();
+      const error = this.authService.error();
+      const isAuthenticated = this.authService.isAuthenticated();
+
+      this.isLoading = loading;
+
+      if (!loading && error && !isAuthenticated) {
+        this.errorMessage = error === 'Login failed' ? 'Username or password incorrect' : error;
+      }
+
+      if (!loading && isAuthenticated && !error) {
+        if (!this.router.url.includes('/boards')) {
+          this.router.navigate(['/boards']);
+        }
+      }
+    });
+  }
 
   onSubmit() {
     this.clearErrors();
@@ -47,16 +67,8 @@ export class LoginComponent {
       username: this.username,
       password: this.password
     };
-    
+
     this.authService.login(payload);
-    
-    setTimeout(() => {
-      const error = this.authService.error();
-      if (error) {
-        this.errorMessage = 'Username or password incorrect';
-        this.isLoading = false;
-      }
-    }, 1000);
   }
 
   togglePasswordVisibility() {

@@ -4,8 +4,8 @@
       <i class="fas fa-times"></i>
     </button>
 
-    <div class="card-tags">
-      <span class="tag">backend</span>
+    <div class="card-tags" [style.borderTopColor]="color">
+      <span class="tag" [style.borderTopColor]="color">{{card.title}}</span>
     </div>
     <h4  [title]="(card.title | titleTruncate:20).isTruncated ? card.title: card.title">
           {{ (card.title | titleTruncate:20).displayText }}
