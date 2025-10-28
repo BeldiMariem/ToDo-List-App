@@ -234,6 +234,4 @@ For more detailed information about each component, check the individual documen
 
 ### 👩‍💻 Developed with ❤️ by Mariem BELDI.
 
-  
-
-
+ 
