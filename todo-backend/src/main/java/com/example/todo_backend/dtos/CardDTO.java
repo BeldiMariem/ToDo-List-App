@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class CardDTO {
     private Long id;
     private String title;
+    private String tag;
     private String description;
     private Long listId;
     private List<CardMemberDTO> members;

@@ -102,7 +102,7 @@ graph TB
   **1. Open**: [Live Application](http://todo-app-alb-911217416.us-east-1.elb.amazonaws.com)
 
    **2. Login** using:
-   - Demo: `mariem` / `Password20`
+   - Demo: `mariemBeldi` / `Password..20`
    - Google account
    - New registration
 
