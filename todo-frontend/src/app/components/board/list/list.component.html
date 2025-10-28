@@ -1,17 +1,11 @@
-<div
-  cdkDropList
-  [cdkDropListData]="list.cards"
-  (cdkDropListDropped)="drop.emit($event)"
-  class="list"
-  [style.borderTopColor]="list.color"
-  [style.background]="getListBackground()"
->
+<div cdkDropList [cdkDropListData]="list.cards" (cdkDropListDropped)="drop.emit($event)" class="list"
+  [style.borderTopColor]="list.color" [style.background]="getListBackground()">
   <div class="list-header">
- 
+
     <div class="list-title">
       <div class="color-badge" [style.backgroundColor]="list.color"></div>
       <div class="title-content">
-        
+
         <h3 [style.color]="getContrastColor(list.color)"
           [title]="(list.name | titleTruncate:10).isTruncated ? list.name: list.name">
           {{ (list.name | titleTruncate:10).displayText }}
@@ -29,118 +23,88 @@
   </div>
 
   @if (isEditing) {
-    <div class="edit-form-container">
-      <div class="edit-form">
-        <div class="form-group">
-          <label for="list-name-{{ list.id }}">List Name</label>
-          <input
-            id="list-name-{{ list.id }}"
-            type="text"
-            [(ngModel)]="editedName"
-            class="edit-input"
-            placeholder="Enter list name"
-            (keydown.enter)="saveEdit()"
-            (keydown.escape)="cancelEdit()"
-          />
-        </div>
+  <div class="edit-form-container">
+    <div class="edit-form">
+      <div class="form-group">
+        <label for="list-name-{{ list.id }}">List Name</label>
+        <input id="list-name-{{ list.id }}" type="text" [(ngModel)]="editedName" class="edit-input"
+          placeholder="Enter list name" (keydown.enter)="saveEdit()" (keydown.escape)="cancelEdit()" />
+      </div>
 
-        <div class="form-group">
-          <label for="list-color-{{ list.id }}">List Color</label>
-          <div class="color-picker-container">
-            <input
-              id="list-color-{{ list.id }}"
-              type="color"
-              [(ngModel)]="editedColor"
-              class="color-picker"
-            />
-            <span class="color-value">{{ editedColor }}</span>
-          </div>
-        </div>
-
-        <div class="edit-form-actions">
-          <button (click)="saveEdit()" class="btn-save" [disabled]="!editedName.trim()">
-            <i class="fas fa-check"></i> Save Changes
-          </button>
-          <button (click)="cancelEdit()" class="btn-cancel">
-            <i class="fas fa-times"></i> Cancel
-          </button>
+      <div class="form-group">
+        <label for="list-color-{{ list.id }}">List Color</label>
+        <div class="color-picker-container">
+          <input id="list-color-{{ list.id }}" type="color" [(ngModel)]="editedColor" class="color-picker" />
+          <span class="color-value">{{ editedColor }}</span>
         </div>
       </div>
+
+      <div class="edit-form-actions">
+        <button (click)="saveEdit()" class="btn-save" [disabled]="!editedName.trim()">
+          <i class="fas fa-check"></i> Save Changes
+        </button>
+        <button (click)="cancelEdit()" class="btn-cancel">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+      </div>
     </div>
+  </div>
   }
 
   @if (list.cards.length > 0) {
-    <div class="progress-container">
-      <div class="progress-bar">
-        <div
-          class="progress-fill"
-          [style.width]="getProgressPercentage() + '%'"
-          [style.backgroundColor]="list.color"
-        ></div>
+  <div class="progress-container">
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width]="getProgressPercentage() + '%'" [style.backgroundColor]="list.color">
       </div>
     </div>
+  </div>
   }
 
   <div class="cards" [class.empty]="list.cards.length === 0">
     @if (list.cards.length > 0) {
-      @for (card of list.cards; track card.id) {
-        <app-card
-          [card]="card"
-          [color]="list.color"
-          [listId]="list.id"
-          [currentUser]="currentUser"
-          [isCommentsOpen]="isCommentsOpen(card.id)"
-          (delete)="onDeleteCard($event)"
-          (toggleComments)="onToggleCardComments($event)"
-          (addComment)="onAddComment($event)"
-          (deleteComment)="onDeleteCardComment($event)"
-        >
-        </app-card>
-      }
+    @for (card of list.cards; track card.id) {
+    <app-card [card]="card" [color]="list.color" [listId]="list.id" [currentUser]="currentUser"
+      [isCommentsOpen]="isCommentsOpen(card.id)" (delete)="onDeleteCard($event)"
+      (toggleComments)="onToggleCardComments($event)" (addComment)="onAddComment($event)"
+      (deleteComment)="onDeleteCardComment($event)">
+    </app-card>
+    }
     } @else {
-      <div class="empty-list">
-        <div class="empty-icon">
-          <i class="fas fa-clipboard-list"></i>
-        </div>
-        <p>No tasks yet</p>
-        <small>Drag tasks here or click 'Add Task' below</small>
+    <div class="empty-list">
+      <div class="empty-icon">
+        <i class="fas fa-clipboard-list"></i>
       </div>
+      <p>No tasks yet</p>
+      <small>Drag tasks here or click 'Add Task' below</small>
+    </div>
     }
   </div>
 
   @if (activeListId === list.id) {
-    <div class="add-card-form">
-      <div class="form-header">
-        <h4>Add New Task</h4>
-        <button class="btn-close-form" (click)="cancelAddCard.emit()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <input
-        type="text"
-        placeholder="Task title"
-        [(ngModel)]="newCardTitle"
-        class="form-input"
-      />
-      <textarea
-        placeholder="Description (optional)"
-        [(ngModel)]="newCardDescription"
-        class="form-textarea"
-      ></textarea>
-      <div class="form-actions">
-        <button (click)="onAddCard()" class="btn-add" [disabled]="!newCardTitle.trim()">
-          <i class="fas fa-plus"></i> Add Task
-        </button>
-        <button (click)="cancelAddCard.emit()" class="btn-cancel">Cancel</button>
-      </div>
+  <div class="add-card-form">
+    <div class="form-header">
+      <h4>Add New Task</h4>
+      <button class="btn-close-form" (click)="cancelAddCard.emit()">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
+    <input type="text" placeholder="Task title" [(ngModel)]="newCardTitle" class="form-input" />
+    <input type="text" placeholder="Task tag" [(ngModel)]="newCardTag" class="form-input" />
+    <textarea placeholder="Description (optional)" [(ngModel)]="newCardDescription" class="form-textarea"></textarea>
+    <div class="form-actions">
+      <button (click)="onAddCard()" class="btn-add" [disabled]="!newCardTitle.trim()">
+        <i class="fas fa-plus"></i> Add Task
+      </button>
+      <button (click)="cancelAddCard.emit()" class="btn-cancel">Cancel</button>
+    </div>
+  </div>
   }
 
   @if (activeListId !== list.id) {
-    <div class="add-card-footer">
-      <button (click)="showAddCardForm.emit(list.id)" class="add-card-btn">
-        <i class="fas fa-plus-circle"></i> Add Task
-      </button>
-    </div>
+  <div class="add-card-footer">
+    <button (click)="showAddCardForm.emit(list.id)" class="add-card-btn">
+      <i class="fas fa-plus-circle"></i> Add Task
+    </button>
+  </div>
   }
 </div>

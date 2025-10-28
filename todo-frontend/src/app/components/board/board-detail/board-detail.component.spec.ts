@@ -102,8 +102,8 @@ describe('BoardDetailComponent', () => {
   ];
 
   const mockCards: CardDTO[] = [
-    { id: 1, title: 'Task 1', description: 'Description 1', listId: 1, members: [] },
-    { id: 2, title: 'Task 2', description: 'Description 2', listId: 1, members: [] }
+    { id: 1, title: 'Task 1', tag: 'tag 1', description: 'Description 1', listId: 1, members: [] },
+    { id: 2, title: 'Task 2', tag: 'tag 2', description: 'Description 2', listId: 1, members: [] }
   ];
 
   const mockComments: CommentDTO[] = [
@@ -339,7 +339,7 @@ describe('BoardDetailComponent', () => {
 
   describe('Card Operations', () => {
     it('should add card to list', fakeAsync(() => {
-      const payload = { listId: 1, title: 'New Card', description: 'Description' };
+      const payload = { listId: 1, title: 'New Card', tag: 'tag', description: 'Description' };
       const newCard: CardDTO = { id: 3, ...payload, members: [] };
       
       cardService.createCard.and.returnValue(of(newCard));
@@ -349,6 +349,7 @@ describe('BoardDetailComponent', () => {
       
       expect(cardService.createCard).toHaveBeenCalledWith({
         title: 'New Card',
+        tag: 'tag',
         description: 'Description',
         listId: 1,
         members: []
@@ -356,7 +357,7 @@ describe('BoardDetailComponent', () => {
     }));
 
     it('should not add card with empty title', () => {
-      const payload = { listId: 1, title: '', description: 'Description' };
+      const payload = { listId: 1, title: '',tag: 'tag', description: 'Description' };
       
       component.onAddCard(payload);
       
@@ -412,8 +413,8 @@ describe('BoardDetailComponent', () => {
 
     it('should get total tasks count', () => {
       component.lists = [
-        { id: 1, name: 'List 1', color: '#000', boardId: 1, cards: [{ id: 1, title: 'Card 1', listId: 1, members: [] }] } as any,
-        { id: 2, name: 'List 2', color: '#000', boardId: 1, cards: [{ id: 2, title: 'Card 2', listId: 2, members: [] }] } as any
+        { id: 1, name: 'List 1', color: '#000', boardId: 1, cards: [{ id: 1, title: 'Card 1',tag: 'tag 1', listId: 1, members: [] }] } as any,
+        { id: 2, name: 'List 2', color: '#000', boardId: 1, cards: [{ id: 2, title: 'Card 2',tag: 'tag 2', listId: 2, members: [] }] } as any
       ];
       
       const total = component.getTotalTasks();
@@ -471,7 +472,7 @@ describe('BoardDetailComponent', () => {
     it('should get visible members', () => {
       component.isMembersExpanded = false;
       const visible = component.getVisibleMembers();
-      expect(visible.length).toBe(4); // maxVisibleMembers default
+      expect(visible.length).toBe(4); 
       
       component.isMembersExpanded = true;
       const allVisible = component.getVisibleMembers();

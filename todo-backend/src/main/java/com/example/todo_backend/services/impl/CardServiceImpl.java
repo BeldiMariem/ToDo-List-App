@@ -89,6 +89,7 @@ public class CardServiceImpl implements CardService {
     private Card createNewCard(CardDTO cardDto, ListEntity list) {
         Card card = new Card();
         card.setTitle(cardDto.getTitle());
+        card.setTag(cardDto.getTag());
         card.setDescription(cardDto.getDescription());
         card.setList(list);
         return card;
@@ -96,6 +97,7 @@ public class CardServiceImpl implements CardService {
 
     private void updateCardProperties(Card card, CardDTO cardDto) {
         card.setTitle(cardDto.getTitle());
+        card.setDescription(cardDto.getDescription());
         card.setDescription(cardDto.getDescription());
     }
 

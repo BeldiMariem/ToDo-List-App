@@ -392,6 +392,7 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
       const updatePayload: Partial<CardDTO> = {
         id: card.id,
         title: card.title,
+        tag: card.tag,
         description: card.description,
         listId: listId,
         members: card.members || []
@@ -421,11 +422,12 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
     this.activeListId = listId;
   }
 
-  onAddCard(payload: { listId: number, title: string, description: string }) {
+  onAddCard(payload: { listId: number, title: string, tag:string, description: string }) {
     if (!payload.title.trim()) return;
 
     const cardPayload = {
       title: payload.title,
+      tag: payload.tag,
       description: payload.description,
       listId: payload.listId,
       members: []
