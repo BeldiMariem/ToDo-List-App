@@ -12,6 +12,18 @@
     padding: 0 80px;
     overflow-y: auto;
 
+    @media (max-width: 768px) {
+      padding: 0 40px;
+      flex: none;
+      width: 100%;
+      justify-content: flex-start;
+      padding-top: 60px;
+    }
+
+    @media (max-width: 480px) {
+      padding: 40px 24px 24px 24px;
+    }
+
     .logo {
       margin-bottom: 40px;
 
@@ -20,17 +32,28 @@
       }
     }
 
+
     h1 {
       font-size: 2rem;
       font-weight: bold;
       margin-bottom: 8px;
       color: #091e42;
+
+      @media (max-width: 768px) {
+        font-size: 1.75rem;
+        text-align: center;
+      }
     }
 
     .subtitle {
       font-size: 1rem;
       color: #5e6c84;
       margin-bottom: 32px;
+
+      @media (max-width: 768px) {
+        font-size: 0.9rem;
+        text-align: center;
+      }
     }
 
     .success-message {
@@ -44,7 +67,7 @@
       align-items: center;
       gap: 8px;
       animation: fadeIn 0.3s ease;
-      
+
       i {
         font-size: 16px;
       }
@@ -91,7 +114,7 @@
       align-items: center;
       gap: 4px;
       animation: fadeIn 0.3s ease;
-      
+
       i {
         font-size: 12px;
       }
@@ -218,6 +241,10 @@
     align-items: center;
     justify-content: center;
 
+    @media (max-width: 768px) {
+      display: none;
+    }
+
     .illustration {
       max-width: 80%;
       height: auto;
@@ -230,6 +257,7 @@
     opacity: 0;
     transform: translateY(-5px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -237,35 +265,51 @@
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 768px) {
   .register-page {
     flex-direction: column;
-    
+
     .register-left {
       padding: 40px 24px;
       order: 2;
     }
-    
+
     .register-right {
       order: 1;
       padding: 40px 24px;
-      
+
       .illustration {
         max-width: 60%;
       }
     }
   }
 }
+
 .error-message {
   background-color: #fee;
   border: 1px solid #f5c6cb;

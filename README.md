@@ -28,12 +28,42 @@ A modern, collaborative Todo List application featuring real-time updates, built
 - 📅 **Calendar Integration** - Visual task planning
 - 🔔 **Live Notifications** - Instant updates across devices
 - 🌐 **Social Login** - Google OAuth integration
+- 📱 **Fully Responsive** - Optimized for desktop, tablet, and mobile devices
+
+
 
 ### 🛡️ Security & Authentication
 - 🔐 JWT-based authentication
 - 👤 Multiple login options (Email/Password + Google OAuth)
 - 🎪 Secure session management
 - 📧 Password reset functionality
+
+
+## 🏗️ Technical Architecture
+
+### Frontend (User Interface)
+| Component | Technology | Deployment |
+|-----------|------------|------------|
+| **Framework** | Angular 20+ | ECS Fargate |
+| **UI Library** | Angular Material | Application Load Balancer |
+| **State Management** | RxJS + Signals | Port 80 |
+| **Real-time** | WebSocket Client | |
+
+### Backend (Business Logic)
+| Component | Technology | Deployment |
+|-----------|------------|------------|
+| **Framework** | Spring Boot 3.x | ECS Fargate |
+| **Database** | PostgreSQL | RDS Instance |
+| **Authentication** | JWT + OAuth2 | Application Load Balancer |
+| **Real-time** | WebSocket/STOMP | Port 8080 |
+
+### Infrastructure
+| Service | Purpose | Configuration |
+|---------|---------|---------------|
+| **AWS ECS Fargate** | Container Orchestration | Auto-scaling enabled |
+| **Application Load Balancer** | Traffic Distribution | Health checks configured |
+| **RDS PostgreSQL** | Data Storage | Automated backups |
+| **Security Groups** | Network Security | Layer-specific rules |
 
 ## 🏗️ Full Deployment Architecture
 ```mermaid
@@ -66,57 +96,39 @@ graph TB
     style User fill:#fff3e0
 
 ```
-## 🏗️ Technical Architecture
-
-### Frontend (User Interface)
-| Component | Technology | Deployment |
-|-----------|------------|------------|
-| **Framework** | Angular 20+ | ECS Fargate |
-| **UI Library** | Angular Material | Application Load Balancer |
-| **State Management** | RxJS + Signals | Port 80 |
-| **Real-time** | WebSocket Client | |
-
-### Backend (Business Logic)
-| Component | Technology | Deployment |
-|-----------|------------|------------|
-| **Framework** | Spring Boot 3.x | ECS Fargate |
-| **Database** | PostgreSQL | RDS Instance |
-| **Authentication** | JWT + OAuth2 | Application Load Balancer |
-| **Real-time** | WebSocket/STOMP | Port 8080 |
-
-### Infrastructure
-| Service | Purpose | Configuration |
-|---------|---------|---------------|
-| **AWS ECS Fargate** | Container Orchestration | Auto-scaling enabled |
-| **Application Load Balancer** | Traffic Distribution | Health checks configured |
-| **RDS PostgreSQL** | Data Storage | Automated backups |
-| **Security Groups** | Network Security | Layer-specific rules |
-
 ## 🚀 Getting Started
 
 ### 🌐 Access Production
   **1. Open**: [Live Application](http://todo-app-alb-911217416.us-east-1.elb.amazonaws.com)
 
    **2. Login** using:
-   - Demo: `mariem` / `Password20`
+   - Demo: `mariemBeldi` / `Password..20`
    - Google account
    - New registration
 
-### 💻 Local Development
+## 💻 Local Development
 
-#### Backend Setup
+### Full Stack with Docker Compose
 ```bash
-cd todo-backend
+# Run entire application with one command
 docker-compose up --build -d
-# API: http://localhost:8080
-# Docs: http://localhost:8080/swagger-ui/index.html
+
+# Access the application:
+# Frontend: http://localhost:4200
+# Backend API: http://localhost:8080  
+# API Documentation: http://localhost:8080/swagger-ui/index.html
+# Database: PostgreSQL on localhost:5432
 ```
 
-#### Frontend Setup
+### Individual Services (Optional)
 ```bash
+# Backend only
+cd todo-backend
+docker-compose up --build -d
+
+# Frontend only  
 cd todo-frontend
 npm install && ng serve
-# App: http://localhost:4200
 ```
 
 ## ⚙️ System Features
@@ -126,22 +138,24 @@ npm install && ng serve
 - **Board System** - Create, share, and manage collaborative boards
 - **Real-time Messaging** - WebSocket for live updates
 - **RESTful API** - Comprehensive endpoints for all operations
-- **Email Services** - Password reset and notifications
+- **Email Services** - Password reset
 - **Data Validation** - Robust input sanitization
 
 ### Frontend Capabilities
-- **Responsive Design** - Works on desktop and mobile
-- **Component Architecture** - Modular, maintainable codebase
-- **State Management** - Efficient data flow with RxJS
+- **Reactive Architecture** - Real-time state synchronization between components
+- **Hybrid State Management** -  Modern Angular Signals for UI state + RxJS for API operations
 - **Type Safety** - Full TypeScript implementation
 - **Testing Suite** - Unit, integration, and E2E tests
+- **Custom UI Components** - Purpose-built interface for task management
+- **Responsive Design** - Optimized experience across all device sizes
 
 ## 🔄 CI/CD Pipeline
 
 ### Backend Automation
 ```mermaid
+graph LR
     A[📥 Code Commit] --> B[🛠️ Maven Build]
-    B --> C[🧪 Unit Tests]
+    B --> C[🧪 Tests]
     C --> D[📦 Nexus Deployment]
     D --> E[🐳 Docker Build]
     E --> F[🚀 AWS ECS]
@@ -154,7 +168,7 @@ npm install && ng serve
 ```mermaid
 graph LR
     A[📥 Code Commit] --> B[📏 ESLint Check]
-    B --> C[🧪 Unit Tests]
+    B --> C[🧪 Tests]
     C --> D[⚡ Angular Build]
     D --> E[🎯 Cypress E2E]
     E --> F[🐳 Docker Push]
@@ -176,8 +190,8 @@ graph LR
 ### 📊 Monitoring
 - **Health Checks**: Application Load Balancer monitoring
 - **Logging**: Centralized logs via CloudWatch
-- **Metrics**: Performance and error tracking
-- **Auto-scaling**: Dynamic resource allocation
+- **Resource Monitoring** - Basic AWS service metrics
+- **Service Reliability** - ECS automatic container recovery
 
 ### 🔒 Security
 - **Network Isolation**: VPC with public/private subnets
@@ -192,7 +206,7 @@ graph LR
 - ✅ **Containerized applications** with Docker
 - ✅ **Load-balanced traffic** for high availability
 - ✅ **Database persistence** with RDS PostgreSQL
-- ✅ **Automated CI/CD** with Jenkins
+- ✅ **Automated CI/CD** with Jenkins and Nexus
 - ✅ **Real-time capabilities** with WebSocket
 - ✅ **Production monitoring** and health checks
 
@@ -205,16 +219,19 @@ graph LR
 - **Security Hardening** - AWS WAF integration
 
 
+
+## 📚 Project Documentation
+
+For more detailed information about each component, check the individual documentation:
+
+### Backend Documentation
+📖 **[Backend README](./todo-backend/README.md)** - Detailed Spring Boot setup, API documentation, and backend features
+
+### Frontend Documentation  
+📖 **[Frontend README](./todo-frontend/README.md)** - Comprehensive Angular setup, component documentation, and frontend features
+
 ---
 
 ### 👩‍💻 Developed with ❤️ by Mariem BELDI.
-  
 
-### 🛠️ Technology Stack
-**Frontend**: Angular • TypeScript • RxJS • Angular Material  
-**Backend**: Spring Boot • Java 21 • JWT • WebSocket • PostgreSQL  
-**DevOps**: AWS ECS • Docker • Jenkins • Nexus • RDS  
-**Testing**: JUnit • MockMvc • Cypress • ESLint
-
----
-
+ 

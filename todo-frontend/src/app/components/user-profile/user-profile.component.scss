@@ -2,6 +2,14 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
+  
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 12px;
+  }
 }
 
 .header {
@@ -12,12 +20,20 @@
     font-size: 28px;
     font-weight: 700;
     margin: 0 0 8px 0;
+    
+    @media (max-width: 768px) {
+      font-size: 24px;
+    }
   }
   
   .subtitle {
     color: #64748b;
     font-size: 16px;
     margin: 0;
+    
+    @media (max-width: 768px) {
+      font-size: 14px;
+    }
   }
 }
 
@@ -54,6 +70,37 @@
   background: #f8fafc;
   border-bottom: 1px solid #e2e8f0;
   padding: 0 24px;
+  overflow-x: auto;
+  position: relative;
+  
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 30px;
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  &::before {
+    left: 0;
+    background: linear-gradient(90deg, #f8fafc 0%, transparent 100%);
+  }
+  
+  &::after {
+    right: 0;
+    background: linear-gradient(270deg, #f8fafc 0%, transparent 100%);
+  }
+  
+  @media (max-width: 768px) {
+    padding: 0 16px;
+    flex-wrap: nowrap;
+    
+    &::before, &::after {
+      width: 20px;
+    }
+  }
   
   .tab-btn {
     background: transparent;
@@ -67,6 +114,24 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2; 
+    
+    @media (max-width: 768px) {
+      padding: 12px 16px;
+      font-size: 14px;
+    }
+    
+    @media (max-width: 480px) {
+      padding: 10px 12px;
+      font-size: 13px;
+      
+      i {
+        font-size: 14px;
+      }
+    }
     
     &:hover {
       color: #4F46E5;
@@ -78,9 +143,16 @@
     }
   }
 }
-
 .tab-content {
   padding: 32px;
+  
+  @media (max-width: 768px) {
+    padding: 24px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 20px 16px;
+  }
 }
 
 .profile-card {
@@ -92,11 +164,20 @@
       font-size: 20px;
       font-weight: 600;
       margin: 0 0 8px 0;
+      
+      @media (max-width: 480px) {
+        font-size: 18px;
+      }
     }
     
     p {
       color: #64748b;
       margin: 0;
+      font-size: 14px;
+      
+      @media (max-width: 480px) {
+        font-size: 13px;
+      }
     }
   }
   
@@ -116,6 +197,11 @@
     position: relative;
     width: 96px;
     height: 96px;
+    
+    @media (max-width: 480px) {
+      width: 80px;
+      height: 80px;
+    }
     
     img {
       width: 100%;
@@ -154,6 +240,7 @@
     margin-bottom: 8px;
     color: #374151;
     font-weight: 500;
+    font-size: 14px;
   }
   
   input {
@@ -163,6 +250,11 @@
     border-radius: 10px;
     font-size: 16px;
     transition: all 0.2s ease;
+    
+    @media (max-width: 480px) {
+      padding: 12px;
+      font-size: 16px; 
+    }
     
     &:focus {
       outline: none;
@@ -192,12 +284,26 @@
   border-radius: 12px;
   margin-bottom: 24px;
   
+  @media (max-width: 480px) {
+    padding: 16px;
+    gap: 12px;
+    flex-direction: column;
+    text-align: center;
+  }
+  
   .warning-icon {
     color: #dc2626;
     font-size: 24px;
+    flex-shrink: 0;
+    
+    @media (max-width: 480px) {
+      font-size: 20px;
+    }
   }
   
   .warning-content {
+    flex: 1;
+    
     h4 {
       color: #dc2626;
       margin: 0 0 8px 0;
@@ -208,6 +314,7 @@
       color: #7f1d1d;
       margin: 0;
       line-height: 1.5;
+      font-size: 14px;
     }
   }
 }
@@ -223,6 +330,12 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  
+  @media (max-width: 480px) {
+    padding: 12px 20px;
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .btn-primary {
@@ -277,6 +390,11 @@
   z-index: 1000;
   padding: 20px;
   animation: fadeIn 0.2s ease;
+  
+  @media (max-width: 480px) {
+    padding: 16px;
+    align-items: flex-end; 
+  }
 }
 
 .modal {
@@ -286,6 +404,12 @@
   max-width: 480px;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
   animation: modalSlideIn 0.3s ease;
+  
+  @media (max-width: 480px) {
+    border-radius: 20px 20px 0 0;
+    max-width: none;
+    animation: modalSlideUp 0.3s ease;
+  }
 
   .modal-header {
     display: flex;
@@ -293,12 +417,20 @@
     align-items: center;
     padding: 24px;
     border-bottom: 1px solid #e2e8f0;
+    
+    @media (max-width: 480px) {
+      padding: 20px;
+    }
 
     h3 {
       margin: 0;
       color: #2d3748;
       font-size: 20px;
       font-weight: 600;
+      
+      @media (max-width: 480px) {
+        font-size: 18px;
+      }
     }
 
     .close-btn {
@@ -324,15 +456,26 @@
 
   .modal-body {
     padding: 24px;
+    
+    @media (max-width: 480px) {
+      padding: 20px;
+    }
 
     .delete-warning {
       display: flex;
       align-items: flex-start;
       gap: 16px;
       
+      @media (max-width: 480px) {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+      }
+      
       i {
         color: #dc2626;
         font-size: 24px;
+        flex-shrink: 0;
       }
       
       p {
@@ -349,6 +492,17 @@
     gap: 12px;
     padding: 24px;
     border-top: 1px solid #e2e8f0;
+    
+    @media (max-width: 480px) {
+      padding: 20px;
+      flex-direction: column-reverse; 
+    }
+    
+    button {
+      @media (max-width: 480px) {
+        width: 100%;
+      }
+    }
   }
 }
 
@@ -368,25 +522,39 @@
   }
 }
 
-@media (max-width: 768px) {
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tabs {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (max-width: 480px) {
   .profile-container {
-    padding: 16px;
-  }
-  
-  .tabs {
-    padding: 0 16px;
-    
-    .tab-btn {
-      padding: 12px 16px;
-      font-size: 14px;
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
     }
-  }
-  
-  .tab-content {
-    padding: 24px;
-  }
-  
-  .modal {
-    margin: 16px;
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .btn-primary, .btn-danger {
+      margin-top: 8px;
+    }
   }
 }

@@ -20,7 +20,7 @@ export class ListComponent {
 
   @Output() delete = new EventEmitter<number>();
   @Output() showAddCardForm = new EventEmitter<number>();
-  @Output() addCard = new EventEmitter<{listId: number, title: string, description: string}>();
+  @Output() addCard = new EventEmitter<{listId: number, title: string, tag:string, description: string}>();
   @Output() cancelAddCard = new EventEmitter<void>();
   @Output() drop = new EventEmitter<any>();
   @Output() deleteCard = new EventEmitter<{cardId: number, listId: number}>();
@@ -31,6 +31,7 @@ export class ListComponent {
 
   newCardTitle = '';
   newCardDescription = '';
+  newCardTag = '';
   isEditing = false;
   editedName = '';
   editedColor = '';
@@ -97,9 +98,11 @@ saveEdit(): void {
     this.addCard.emit({
       listId: this.list.id,
       title: this.newCardTitle,
+      tag: this.newCardTag,
       description: this.newCardDescription
     });
     this.newCardTitle = '';
+    this.newCardTag = '';
     this.newCardDescription = '';
   }
 

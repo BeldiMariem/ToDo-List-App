@@ -11,6 +11,16 @@
     justify-content: center;
     padding: 0 80px;
 
+    @media (max-width: 768px) {
+      padding: 0 40px;
+      flex: none;
+      width: 100%;
+    }
+
+    @media (max-width: 480px) {
+      padding: 0 24px;
+    }
+
     .logo {
       margin-bottom: 40px;
 
@@ -24,12 +34,20 @@
       font-weight: bold;
       margin-bottom: 8px;
       color: #091e42;
+
+      @media (max-width: 768px) {
+        font-size: 1.75rem;
+      }
     }
 
     .subtitle {
       font-size: 1rem;
       color: #5e6c84;
       margin-bottom: 32px;
+
+      @media (max-width: 768px) {
+        font-size: 0.9rem;
+      }
     }
 
     .form-field {
@@ -127,12 +145,17 @@
     align-items: center;
     justify-content: center;
 
+    @media (max-width: 768px) {
+      display: none;
+    }
+
     .illustration {
       max-width: 80%;
       height: auto;
     }
   }
 }
+
 .error-message {
   background-color: #fef2f2;
   color: #dc2626;
@@ -173,7 +196,7 @@ input.error {
 .login-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
-  
+
   &:hover {
     transform: none !important;
   }
@@ -187,11 +210,11 @@ input.error {
 .login-button {
   position: relative;
   transition: all 0.3s ease;
-  
+
   &:disabled {
     opacity: 0.7;
     cursor: not-allowed;
-    
+
     &:hover {
       transform: none;
       box-shadow: none;
@@ -204,6 +227,7 @@ input.error {
     opacity: 0;
     transform: translateY(-5px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -211,9 +235,19 @@ input.error {
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
 }
 
 input.error {
@@ -293,6 +327,7 @@ input.error {
     cursor: not-allowed;
   }
 }
+
 .fa-spinner {
   margin-right: 8px;
 }
@@ -327,6 +362,7 @@ input.error {
 input.error {
   border-color: #dc3545;
 }
+
 .password-input-container {
   position: relative;
   display: flex;
@@ -335,7 +371,7 @@ input.error {
 
 .password-input-container input {
   width: 100%;
-  padding-right: 45px; 
+  padding-right: 45px;
 }
 
 .toggle-password {
