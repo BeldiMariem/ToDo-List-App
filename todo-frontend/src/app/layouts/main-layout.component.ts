@@ -22,8 +22,20 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   private notificationSubscription!: Subscription;
   private unreadCountSubscription!: Subscription;
   private notificationService = inject(NotificationService);
+  private mobileQuery: MediaQueryList;
+  private mobileQueryListener: () => void;
+
+  constructor() {
+    this.mobileQuery = window.matchMedia('(max-width: 768px)');
+    this.isSidebarCollapsed = this.mobileQuery.matches; 
+    
+    this.mobileQueryListener = () => {
+      this.isSidebarCollapsed = this.mobileQuery.matches;
+    };
+  }
 
   ngOnInit() {
+    this.mobileQuery.addEventListener('change', this.mobileQueryListener);
 
     this.notificationSubscription = this.notificationService.notifications$
       .subscribe(notifications => {
@@ -51,6 +63,10 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
 
   onMenuItemSelected(menuItemId: string) {
     console.log('Selected menu item:', menuItemId);
+    
+    if (this.mobileQuery.matches) {
+      this.isSidebarCollapsed = true;
+    }
   }
 
   onSidebarToggle() {
@@ -69,13 +85,9 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     this.isNotificationPanelOpen = false;
   }
 
-
-
   markAsRead(id: number) {
     this.notificationService.markAsRead(id);
   }
-
-
 
   clearAllNotifications() {
     this.notificationService.clearAllNotifications();
@@ -102,5 +114,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     if (this.unreadCountSubscription) {
       this.unreadCountSubscription.unsubscribe();
     }
+    
+    this.mobileQuery.removeEventListener('change', this.mobileQueryListener);
   }
 }
