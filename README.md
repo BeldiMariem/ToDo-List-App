@@ -8,8 +8,8 @@
 
 ## 🧪 Quick Testing
 **Demo Account for immediate access:**
-- **Username**: `mariem`
-- **Password**: `Password20`
+- **Username**: `mariemBeldi`
+- **Password**: `Password..20`
 
 **Alternative Login Methods:**
 - 🔐 **Google OAuth** - Sign in with your Google account
