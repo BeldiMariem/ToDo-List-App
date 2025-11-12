@@ -1,10 +1,22 @@
 # 📝 ToDo List App - Full Stack AWS Deployment
 
+A modern, collaborative Todo List application featuring real-time updates, built with **Angular** and **Spring Boot**, deployed on **AWS cloud infrastructure**.
+---
+
+## 🎯 Features
+
+### ✨ Core Functionality
+- ✅ **Task Management** - Create, edit, and organize tasks
+- 👥 **Team Collaboration** - Shared boards and real-time updates  
+- 📅 **Calendar Integration** - Visual task planning
+- 🔔 **Live Notifications** - Instant updates across devices
+- 🌐 **Social Login** - Google OAuth integration
+- 📱 **Fully Responsive** - Optimized for desktop, tablet, and mobile devices
 ## 🚀 Live Application
+
+
 **Access the deployed application here:**  
 🔗 **[http://todo-app-alb-911217416.us-east-1.elb.amazonaws.com](http://todo-app-alb-911217416.us-east-1.elb.amazonaws.com)**
-
----
 
 ## 🧪 Quick Testing
 **Demo Account for immediate access:**
@@ -17,18 +29,6 @@
 
 ---
 
-## 📖 Overview
-A modern, collaborative Todo List application featuring real-time updates, built with **Angular** and **Spring Boot**, deployed on **AWS cloud infrastructure**.
-
-## 🎯 Features
-
-### ✨ Core Functionality
-- ✅ **Task Management** - Create, edit, and organize tasks
-- 👥 **Team Collaboration** - Shared boards and real-time updates  
-- 📅 **Calendar Integration** - Visual task planning
-- 🔔 **Live Notifications** - Instant updates across devices
-- 🌐 **Social Login** - Google OAuth integration
-- 📱 **Fully Responsive** - Optimized for desktop, tablet, and mobile devices
 
 ## ☁️ AWS Infrastructure Overview
 
@@ -218,13 +218,7 @@ graph LR
 - ✅ **Real-time capabilities** with WebSocket
 - ✅ **Production monitoring** and health checks
 
-### 🔮 Planned Enhancements
-- **HTTPS Encryption** - SSL certificate implementation
-- **Advanced Caching** - Redis for performance
-- **Enhanced Monitoring** - Detailed CloudWatch dashboards
-- **Blue-Green Deployment** - Zero-downtime updates
-- **Database Optimization** - Read replicas and indexing
-- **Security Hardening** - AWS WAF integration
+
 
 
 
