@@ -30,6 +30,14 @@ A modern, collaborative Todo List application featuring real-time updates, built
 - 🌐 **Social Login** - Google OAuth integration
 - 📱 **Fully Responsive** - Optimized for desktop, tablet, and mobile devices
 
+## ☁️ AWS Infrastructure Overview
+
+The application is deployed using AWS services, including **ECS Fargate**, **RDS**, and **Application Load Balancer (ALB)** for high availability and scalability.
+
+Below is a snapshot from the AWS Management Console showing the **Application Load Balancer** configuration:
+
+<img width="1914" height="910" alt="aws" src="https://github.com/user-attachments/assets/fdd9db9a-a4cd-4fed-8aa0-5a62117942c4" />
+
 
 
 ### 🛡️ Security & Authentication
