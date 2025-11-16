@@ -1,6 +1,6 @@
 # 📝 ToDo List App - Full Stack AWS Deployment
 
-A modern, collaborative Todo List application featuring real-time updates, built with **Angular** and **Spring Boot**, deployed on **AWS cloud infrastructure**.
+A modern, collaborative Todo List application featuring real-time updates, built with **Angular20.1** and **Spring Boot with Java21**, deployed on **AWS cloud infrastructure**.
 ---
 
 ## 🎯 Features
@@ -52,7 +52,7 @@ Below is a snapshot from the AWS Management Console showing the **Application Lo
 ### Frontend (User Interface)
 | Component | Technology | Deployment |
 |-----------|------------|------------|
-| **Framework** | Angular 20+ | ECS Fargate |
+| **Framework** | Angular 20.1 | ECS Fargate |
 | **UI Library** | Angular Material | Application Load Balancer |
 | **State Management** | RxJS + Signals | Port 80 |
 | **Real-time** | WebSocket Client | |
@@ -60,7 +60,7 @@ Below is a snapshot from the AWS Management Console showing the **Application Lo
 ### Backend (Business Logic)
 | Component | Technology | Deployment |
 |-----------|------------|------------|
-| **Framework** | Spring Boot 3.x | ECS Fargate |
+| **Framework** | Spring Boot 3.x with Java21 | ECS Fargate |
 | **Database** | PostgreSQL | RDS Instance |
 | **Authentication** | JWT + OAuth2 | Application Load Balancer |
 | **Real-time** | WebSocket/STOMP | Port 8080 |
