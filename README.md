@@ -16,7 +16,7 @@ A modern, collaborative Todo List application featuring real-time updates, built
 
 
 **Access the deployed application here:**  
-🔗 **[http://todo-app-alb-911217416.us-east-1.elb.amazonaws.com](http://todo-app-alb-911217416.us-east-1.elb.amazonaws.com)**
+🔗 **[Live Demo](http://the-todo-app.duckdns.org)**
 
 ## 🧪 Quick Testing
 **Demo Account for immediate access:**
